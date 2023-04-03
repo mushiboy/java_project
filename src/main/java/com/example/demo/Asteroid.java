@@ -1,27 +1,21 @@
 package com.example.demo;
 
-import javafx.geometry.Point2D;
-import javafx.scene.shape.Polygon;
-
 import java.util.Random;
 
 public class Asteroid extends Character {
 
-    private double rotationalMovement;
-    public enum AsteroidSize {
-        LARGE, MEDIUM, SMALL;
-    }
+    private final AsteroidType type;
+    private final double rotationalMovement;
 
-    private AsteroidSize size;
-    Random rnd = new Random();
+    private final int size;
 
 
-    public Asteroid(int x, int y) {
+    public Asteroid(int x, int y, AsteroidType type) {
 
         super(new PolygonFactory().createPolygon(), x, y);
+        this.type = type;
 
         Random rnd = new Random();
-
         super.getCharacter().setRotate(rnd.nextInt(360));
 
         int accelerationAmount = 1 + rnd.nextInt(10);
@@ -30,46 +24,51 @@ public class Asteroid extends Character {
         }
 
         this.rotationalMovement = 0.5 - rnd.nextDouble();
-
-    }
-
-    public void setSize(AsteroidSize size) {
-        this.size = size;
-    }
-
-    public void breakApart() {
-        switch (size) {
-            case LARGE:
-                // Create two medium-sized asteroids with random directions and speeds
-                for (int i = 0; i < 2; i++) {
-                    Asteroid medium = new Asteroid(getX(), getY(), AsteroidSize.MEDIUM);
-                    medium.setVelocity(rnd.nextInt(3) - 1, rnd.nextInt(3) - 1);
-                    medium.accelerate();
-                    getParent().addChild(medium);
-                }
-                break;
-            case MEDIUM:
-                // Create two small-sized asteroids with random directions and speeds
-                for (int i = 0; i < 2; i++) {
-                    Asteroid small = new Asteroid(getX(), getY(), AsteroidSize.SMALL);
-                    small.setVelocity(rnd.nextInt(3) - 1, rnd.nextInt(3) - 1);
-                    small.accelerate();
-                    getParent().addChild(small);
-                }
-                break;
-            case SMALL:
-                // Do nothing
-                break;
-            default:
-                break;
+        switch (type) {
+            case LARGE -> size = 50;
+            case MEDIUM -> size = 30;
+            case SMALL -> size = 20;
+            default -> size = 0;
         }
     }
-    
 
-    public void update(long deltaTime) {
-        super.update(deltaTime);
-        super.getCharacter().setRotate(super.getCharacter().getRotate() + rotationalMovement);
+    public enum AsteroidType {
+        LARGE, MEDIUM, SMALL;
+        public AsteroidType nextSize() {
+            return switch (this) {
+                case LARGE -> MEDIUM;
+                default -> SMALL;
+            };
+        }
+
     }
+
+    public int getSize() {
+        return size;
+    }
+    public Asteroid[] destroy() {
+        if (type == AsteroidType.SMALL) {
+            return new Asteroid[0];
+        } else {
+            Random rnd = new Random();
+            Asteroid[] newAsteroids = new Asteroid[2];
+            for (int i = 0; i < newAsteroids.length; i++) {
+                newAsteroids[i] = new Asteroid((int) getCharacter().getTranslateX(), (int) getCharacter().getTranslateY(), type.nextSize());
+                newAsteroids[i].setMovement(getMovement().normalize().multiply(2 + rnd.nextInt(6)));
+            }
+            return newAsteroids;
+        }
+    }
+
+
+
+    public void move() {
+        super.getCharacter().setRotate(super.getCharacter().getRotate() + rotationalMovement);
+        super.move();
+    }
+
+
+
 
 }
 

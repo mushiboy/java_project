@@ -73,9 +73,13 @@ public abstract class Character {
         this.movement = this.movement.add(changeX, changeY);
     }
 
-    public boolean collide(Character other) {
-        Shape collisionArea = Shape.intersect(this.character, other.getCharacter());
-        return collisionArea.getBoundsInLocal().getWidth() != -1;
+//    public boolean collide(Character other) {
+//        Shape collisionArea = Shape.intersect(this.character, other.getCharacter());
+//        return collisionArea.getBoundsInLocal().getWidth() != -1;
+//    }
+
+    public boolean collide(Asteroid asteroid) {
+        return asteroid.getCharacter().getBoundsInParent().intersects(getCharacter().getBoundsInParent());
     }
 
 

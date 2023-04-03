@@ -18,6 +18,9 @@ public class AsteroidsApp extends Application {
     public static int HEIGHT = 600;
 
     public static AtomicInteger points;
+    public static void main(String[] args) {
+        launch(args);
+    }
 
 
     @Override
@@ -37,9 +40,24 @@ public class AsteroidsApp extends Application {
         List<Asteroid> asteroids = new ArrayList<>();
         for (int i = 0; i < 8; i++) {
             Random rnd = new Random();
-            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT));
+            int typeIndex = rnd.nextInt(3);
+
+            Asteroid.AsteroidType type;
+            switch (typeIndex) {
+                case 0:
+                    type = Asteroid.AsteroidType.LARGE;
+                    break;
+                case 1:
+                    type = Asteroid.AsteroidType.MEDIUM;
+                    break;
+                default:
+                    type = Asteroid.AsteroidType.SMALL;
+                    break;
+            }
+            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), type);
             asteroids.add(asteroid);
         }
+
 
         pane.getChildren().add(ship.getCharacter());
         asteroids.forEach(asteroid -> pane.getChildren().add(asteroid.getCharacter()));
@@ -49,9 +67,7 @@ public class AsteroidsApp extends Application {
         Scene scene = new Scene(pane);
 
         Map<KeyCode, Boolean> pressedKeys = new HashMap<>();
-
         scene.setOnKeyPressed(event -> pressedKeys.put(event.getCode(), Boolean.TRUE));
-
         scene.setOnKeyReleased(event -> pressedKeys.put(event.getCode(), Boolean.FALSE));
 
 
@@ -85,8 +101,6 @@ public class AsteroidsApp extends Application {
 
 
 
-//
-
                 if (pressedKeys.getOrDefault(KeyCode.SPACE, false) && bullets.size() < 3) {
                     // we shoot
                     Bullet bullet = new Bullet((int) ship.getCharacter().getTranslateX(), (int) ship.getCharacter().getTranslateY());
@@ -97,15 +111,16 @@ public class AsteroidsApp extends Application {
                     bullet.setMovement(bullet.getMovement().normalize().multiply(3));
 
                     pane.getChildren().add(bullet.getCharacter());
-
-
                 }
 
                 bullets.forEach(bullet -> {
                     asteroids.forEach(asteroid -> {
                         if(bullet.collide(asteroid)) {
                             bullet.setAlive(false);
-                            asteroid.setAlive(false);
+                            Asteroid[] newAsteroids = asteroid.destroy();
+                            for (Asteroid newAsteroid : newAsteroids) {
+                                asteroids.add(newAsteroid);
+                            }
                         }
                     });
 
@@ -142,9 +157,7 @@ public class AsteroidsApp extends Application {
         stage.show();
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+
 }
 
 
