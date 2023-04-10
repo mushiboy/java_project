@@ -34,7 +34,7 @@ public class Alien extends Character{
 
 
 
-    public boolean collide(Bullets other){
+    public boolean collide(Character other){
         Shape collisionArea = Shape.intersect(super.getCharacter(), other.getCharacter());
         return collisionArea.getBoundsInLocal().getWidth() != -1;
     }

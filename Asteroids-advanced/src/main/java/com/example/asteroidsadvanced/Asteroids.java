@@ -35,8 +35,10 @@ public class Asteroids extends Character{
         return this.level;
     }
 
-    public boolean collide(Bullets other){
+    public boolean collide(Character other){
         Shape collisionArea = Shape.intersect(super.getCharacter(), other.getCharacter());
         return collisionArea.getBoundsInLocal().getWidth() != -1;
     }
+
+
 }

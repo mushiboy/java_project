@@ -22,6 +22,7 @@ public class myGame extends Application {
     List<Alien> aliens = new ArrayList<>();
     public boolean surprise = true;
     Pane pane = new Pane();
+    Pane end_pane = new Pane();
     double Rotation = 0;
     @Override
     public void start(Stage stage) throws Exception {
@@ -45,6 +46,7 @@ public class myGame extends Application {
             pane.getChildren().add(asteroid.getCharacter());
         });
         Scene scene = new Scene(pane);
+        Scene endgame = new Scene(end_pane);
         stage.setScene(scene);
         stage.show();
 
@@ -97,6 +99,20 @@ public class myGame extends Application {
                 asteroids.forEach(asteroid -> {
                     asteroid.move();
 
+                });
+
+                asteroids.forEach(asteroid -> {
+                    if(asteroid.collide(ship)){
+                        pane.getChildren().remove(ship.getCharacter());
+                        stage.setScene(endgame);
+                        text.setText("Game Over");
+                    }
+                });
+                aliens.forEach(alien -> {
+                    if(alien.collide(ship)){
+                        pane.getChildren().remove(ship.getCharacter());
+                        text.setText("Game Over");
+                    }
                 });
                 bullets.forEach(bullet -> {
                     bullet.move();
