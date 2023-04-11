@@ -9,7 +9,7 @@ import java.util.Random;
 public class Asteroids extends Character{
     // Define instance variables
     private double rotationalMovement; // the amount of rotational movement that the asteroid should have
-    private int level; // the level of the asteroid (1, 2, or 3)
+    private int size; // the size of the asteroid (1, 2, or 3)
     int accelerationAmount; // the amount of acceleration that the asteroid should have
     private Random rnd = new Random(); // a Random object used for generating random numbers
 
@@ -19,7 +19,7 @@ public class Asteroids extends Character{
         super(new Polygon(25.0*z, 0.0, 50.0*z, 15.0*z, 40.0*z, 40.0*z, 10.0*z, 40.0*z, 0.0, 15.0*z), x, y);
 
         // Set the level instance variable
-        this.level = z;
+        this.size = z;
 
         // Set the movement of the asteroid to (0.1, 0.1)
         super.setMovement(0.1, 0.1);
@@ -59,8 +59,8 @@ public class Asteroids extends Character{
     }
 
     // Define a method to get the level of the asteroid
-    public int getLevel(){
-        return this.level;
+    public int getSize(){
+        return this.size;
     }
 
     // Define a method to check if the asteroid has collided with a Bullets object

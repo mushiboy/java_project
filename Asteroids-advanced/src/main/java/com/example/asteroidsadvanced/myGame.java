@@ -43,14 +43,33 @@ public class myGame extends Application {
         Text text = new Text(10,20,"Points:"+points);
         pane.getChildren().add(text);
 
-        // Adding Asteroids
-        while(asteroids.size() < 10){
-            Asteroids asteroid = new Asteroids(rnd.nextInt(1000), rnd.nextInt(1000), rnd.nextInt(1,4));
-            asteroids.add(asteroid);
+        Level[] levels = Level.createLevels();
+
+        // Loop through the levels
+        for (Level level : levels) {
+            // Adding Asteroids for the current level
+            List<Asteroids> asteroids = level.getCurrentLevelAsteroids();
+            asteroids.forEach(asteroid -> {
+                pane.getChildren().add(asteroid.getCharacter());
+            });
+        
+            // Wait for the player to finish the level
+            waitForLevelCompletion();
+        
+            // Increase the level and get the new asteroids for the next level
+            List<Asteroids> nextLevelAsteroids = level.getNextLevelAsteroids();
+        
+            // Check if there are no more levels
+            if (nextLevelAsteroids == null) {
+                // Game is over
+                break;
+            }
+        
+            // Remove the current asteroids from the pane
+            asteroids.forEach(asteroid -> {
+                pane.getChildren().remove(asteroid.getCharacter());
+            });
         }
-        asteroids.forEach(asteroid -> {
-            pane.getChildren().add(asteroid.getCharacter());
-        });
 
         // Creating Scene and Setting Stage
         Scene scene = new Scene(pane);
