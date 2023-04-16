@@ -3,6 +3,7 @@ package com.example.asteroidsadvanced;
 // Import the required JavaFX classes
 import javafx.geometry.Point2D;
 import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Shape;
 
 // Define a Character class
 public class Character {
@@ -81,4 +82,8 @@ public class Character {
 
     }
 
+    public boolean collide(Character other){
+        Shape collisionArea = Shape.intersect(this.getCharacter(), other.getCharacter());
+        return collisionArea.getBoundsInLocal().getWidth() != -1;
+    }
 }

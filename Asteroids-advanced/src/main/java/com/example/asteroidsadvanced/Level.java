@@ -56,7 +56,7 @@ public class Level {
         }
     }
 
-    public List<Character> getCurrentLevelEnemies() {
+    public List<Character> getEnemyList() {
         return enemyList;
     }
 

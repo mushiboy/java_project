@@ -31,11 +31,4 @@ public class Alien extends Character{
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
-
-
-
-    public boolean collide(Character other){
-        Shape collisionArea = Shape.intersect(super.getCharacter(), other.getCharacter());
-        return collisionArea.getBoundsInLocal().getWidth() != -1;
-    }
 }
