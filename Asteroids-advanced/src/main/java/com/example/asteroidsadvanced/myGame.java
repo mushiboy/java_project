@@ -1,5 +1,5 @@
-// Importing necessary libraries
 package com.example.asteroidsadvanced;
+
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -8,75 +8,35 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
 import java.security.Key;
 import java.util.*;
 
-// Class Definition
 public class myGame extends Application {
-
-    // Defining class variables
     public static int Width = 1980;
     public static int Height = 1080;
     public int points = 0;
     List<Bullets> bullets = new ArrayList<>();
     List<Bullets> bullets1 = new ArrayList<>();
-    List<Asteroids> asteroids = new ArrayList<>();
-    List<Alien> aliens = new ArrayList<>();
+    List<Character> enemies = new ArrayList<>();
     public boolean surprise = true;
     Pane pane = new Pane();
+    Pane end_pane = new Pane();
     double Rotation = 0;
-
-    // Start Method to Initialize the Game
     @Override
     public void start(Stage stage) throws Exception {
-        // Creating Random Object
         Random rnd = new Random();
-
-        // Creating Pane and Setting Preferences
         pane.setPrefSize(Width, Height);
-
-        // Adding Ship
         Ship ship = new Ship(Width/2,Height/2);
         pane.getChildren().add(ship.getCharacter());
-
-        // Adding Score Text
         Text text = new Text(10,20,"Points:"+points);
         pane.getChildren().add(text);
 
-        Level[] levels = Level.createLevels();
-
-        // Loop through the levels
-        for (Level level : levels) {
-            // Adding Asteroids for the current level
-            List<Asteroids> asteroids = level.getCurrentLevelAsteroids();
-            asteroids.forEach(asteroid -> {
-                pane.getChildren().add(asteroid.getCharacter());
-            });
-        
-            // Wait for the player to finish the level
-            waitForLevelCompletion();
-        
-            // Increase the level and get the new asteroids for the next level
-            List<Asteroids> nextLevelAsteroids = level.getNextLevelAsteroids();
-        
-            // Check if there are no more levels
-            if (nextLevelAsteroids == null) {
-                // Game is over
-                break;
-            }
-        
-            // Remove the current asteroids from the pane
-            asteroids.forEach(asteroid -> {
-                pane.getChildren().remove(asteroid.getCharacter());
-            });
-        }
-
-        // Creating Scene and Setting Stage
         Scene scene = new Scene(pane);
+        Scene endgame = new Scene(end_pane);
         stage.setScene(scene);
         stage.show();
 
-        // Key Pressed and Key Released Events
         Map<KeyCode, Boolean> pressedKey = new HashMap<>();
         scene.setOnKeyPressed(keyEvent -> {
             pressedKey.put(keyEvent.getCode(), Boolean.TRUE);
@@ -85,87 +45,66 @@ public class myGame extends Application {
             pressedKey.put(keyEvent.getCode(),Boolean.FALSE);
         });
 
-        // Animation Timer to Run the Game
         new AnimationTimer(){
             private long lastUpdate = 0;
             private long lastbullets = 0;
 
             public void handle(long now){
-                // Hyperspace
                 if(pressedKey.getOrDefault(KeyCode.A,false)){ship.Hyperspace();}
-                // Turning Left
                 if(pressedKey.getOrDefault(KeyCode.LEFT, false)){ship.turnLeft();}
-                // Turning Right
                 if(pressedKey.getOrDefault(KeyCode.RIGHT,false)){ship.turnRight();}
-                // Accelerating
                 if(pressedKey.getOrDefault(KeyCode.UP,false)){ship.acc();}
-                // Firing Bullets
                 if(pressedKey.getOrDefault(KeyCode.SPACE, false) && (now - lastUpdate >330_000_000)){
-                    // create new bullet object
                     Bullets bullet = new Bullets((int)(ship.getCharacter().getTranslateX()),(int)(ship.getCharacter().getTranslateY()));
-                    // set bullet rotation
                     bullet.getCharacter().setRotate(ship.getCharacter().getRotate());
-                    // add bullet to the bullets list
                     bullets.add(bullet);
-                    // move bullet forward
                     bullet.acc();
-                    // add bullet to the pane
                     pane.getChildren().add(bullet.getCharacter());
-                    // update timestamp
                     lastUpdate = now;
                 }
-                // Adding Aliens
-                if( rnd.nextInt(100)<2 && aliens.size() == 0){
-                    // create a new alien object at a random position
-                    Alien alien = new Alien(1,rnd.nextInt(100,900));
-                    // add alien to the aliens list
-                    aliens.add(alien);
-                    // add alien to the pane
-                    pane.getChildren().add(alien.getCharacter());
-                }
-                // Alien Shooting Bullets
-                if(aliens.size() == 1){
+                
+                if(enemies.size() == 1){
                     while(now - lastbullets > 440_000_000 && aliens.size()>0){
-                        // create new bullet object for alien
                         Bullets bullet1 = new Bullets((int)(aliens.get(0).getCharacter().getTranslateX()),(int)(aliens.get(0).getCharacter().getTranslateY()));
-                        // set bullet rotation
                         bullet1.getCharacter().setRotate(Rotation += 60);
-                        // add bullet to the bullets1 list
                         bullets1.add(bullet1);
-                        // move bullet forward
                         bullet1.acc();
-                        // add bullet to the pane
                         pane.getChildren().add(bullet1.getCharacter());
-                        // update timestamp
                         lastbullets = now;
                     }
 
-                    // move the alien
-                    aliens.get(0).move();
+                    enemies.get(0).move();
                 }
 
-                // move the player's ship
                 ship.move();
-                // move all the asteroids
-                asteroids.forEach(asteroid -> {
+                enemies.forEach(asteroid -> {
                     asteroid.move();
 
                 });
-                // move all the bullets fired by the player's ship
+
+                enemies.forEach(asteroid -> {
+                    if(asteroid.collide(ship)){
+                        pane.getChildren().remove(ship.getCharacter());
+                        stage.setScene(endgame);
+                        text.setText("Game Over");
+                    }
+                });
+                enemies.forEach(alien -> {
+                    if(alien.collide(ship)){
+                        pane.getChildren().remove(ship.getCharacter());
+                        text.setText("Game Over");
+                    }
+                });
                 bullets.forEach(bullet -> {
                     bullet.move();
                 });
-                // move all the bullets fired by the aliens
                 bullets1.forEach(bullet1 -> {
                     bullet1.move();
                 });
-                // check if any of the player's ship's bullets hit an asteroid
                 bullets.forEach(bullet -> {
-                    asteroids.forEach(asteroid -> {
+                    enemies.forEach(asteroid -> {
                         if(asteroid.collide(bullet)){
-                             // if the asteroid is at level 1, increase the points and remove the asteroid and bullet
                             if(asteroid.getLevel() == 1){points += 10;text.setText("Points:"+points);}
-                            // if the asteroid is not at level 1, create two smaller asteroids of the next lower level, remove the original asteroid and bullet
                             if(asteroid.getLevel() != 1){
                                 double X = asteroid.getCharacter().getTranslateX();
                                 double Y = asteroid.getCharacter().getTranslateY();
@@ -173,23 +112,18 @@ public class myGame extends Application {
                                 Downgrade((int)X+10,(int)Y+10,Z);
                                 Downgrade((int)X-10,(int)Y-10,Z);
                             }
-                            // Remove the asteroid and bullet from the game
                             pane.getChildren().remove(asteroid.getCharacter());
-                            asteroids.remove(asteroid);
+                            enemies.remove(asteroid);
                             pane.getChildren().remove(bullet.getCharacter());
                             bullets.remove(bullet);
                         }
                     });
                 });
-
-                // check if any of the player's ship's bullets hit an alien ship
                 bullets.forEach(bullet ->{
-                    aliens.forEach(alien -> {
+                    enemies.forEach(alien -> {
                         if(alien.collide(bullet)){
-
-                            // Remove the alien ship and bullet from the game, and increase the player's points
                             pane.getChildren().remove(alien.getCharacter());
-                            aliens.remove(alien);
+                            enemies.remove(alien);
                             pane.getChildren().remove(bullet.getCharacter());
                             bullets.remove(bullet);
                             bullets1.forEach(bullet1 -> {
@@ -206,15 +140,13 @@ public class myGame extends Application {
         }.start();
     }
 
-    // define Downgrade function to create two smaller asteroids from a larger one
     public void Downgrade(int x,int y,int z){
         Asteroids asteroid = new Asteroids(x,y,z-1);
-        asteroids.add(asteroid);
+        enemies.add(asteroid);
         pane.getChildren().add(asteroid.getCharacter());
 
     }
 
-    // main method to launch the game
     public static void main(String[] args){
         launch(args);
     }
