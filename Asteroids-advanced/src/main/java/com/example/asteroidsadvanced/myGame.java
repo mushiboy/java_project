@@ -20,6 +20,7 @@ public class myGame extends Application {
     List<Bullets> bullets1 = new ArrayList<>();
     List<Character> enemies = new ArrayList<>();
     private Level[] levels; // declare array to store levels
+    private int currentLevel;
     public boolean surprise = true;
     Pane pane = new Pane();
     Pane end_pane = new Pane();
@@ -40,9 +41,9 @@ public class myGame extends Application {
         stage.show();
 
         // create levels array
-        int currentLevel = 0;
         Level[] levels = Level.createLevels();
-        enemies = levels[currentLevel].getEnemyList();
+        enemies = levels[0].getEnemyList();
+        currentLevel = levels[0].getLevelNumber();
 
 
         Map<KeyCode, Boolean> pressedKey = new HashMap<>();
@@ -108,18 +109,23 @@ public class myGame extends Application {
                         bullet1.move();
                     });
                     bullets.forEach(bullet -> {
-                        enemies.forEach(asteroid -> {
-                            if(asteroid.collide(bullet)){
-                                if(asteroid.getLevel() == 1){points += 10;text.setText("Points:"+points);}
-                                if(asteroid.getLevel() != 1){
-                                    double X = asteroid.getCharacter().getTranslateX();
-                                    double Y = asteroid.getCharacter().getTranslateY();
-                                    int Z = asteroid.getLevel();
-                                    Downgrade((int)X+10,(int)Y+10,Z);
-                                    Downgrade((int)X-10,(int)Y-10,Z);
+                        enemies.forEach(enemy -> {
+                            if(enemy.collide(bullet)){
+                                if(enemy instanceof Asteroids) {
+                                    Asteroids asteroid = (Asteroids) enemy;
+                                    if(asteroid.getSize() == 1) {
+                                        points += 10;
+                                        text.setText("Points:"+points);
+                                    } else {
+                                        double X = asteroid.getCharacter().getTranslateX();
+                                        double Y = asteroid.getCharacter().getTranslateY();
+                                        int Z = asteroid.getSize();
+                                        Downgrade((int)X+10,(int)Y+10,Z);
+                                        Downgrade((int)X-10,(int)Y-10,Z);
+                                    }
+                                    pane.getChildren().remove(asteroid.getCharacter());
+                                    enemies.remove(asteroid);
                                 }
-                                pane.getChildren().remove(asteroid.getCharacter());
-                                enemies.remove(asteroid);
                                 pane.getChildren().remove(bullet.getCharacter());
                                 bullets.remove(bullet);
                             }

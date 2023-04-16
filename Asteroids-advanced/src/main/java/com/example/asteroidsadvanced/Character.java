@@ -82,8 +82,12 @@ public class Character {
 
     }
 
-    public boolean collide(Character other){
-        Shape collisionArea = Shape.intersect(this.getCharacter(), other.getCharacter());
-        return collisionArea.getBoundsInLocal().getWidth() != -1;
+    public boolean collide(Character other) {
+        if (other instanceof Asteroids) {
+            Shape collisionArea = Shape.intersect(this.getCharacter(), other.getCharacter());
+            return collisionArea.getBoundsInLocal().getWidth() != -1;
+        } else {
+            return false;
+        }
     }
 }
