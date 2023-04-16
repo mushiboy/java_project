@@ -1,187 +1,224 @@
 package com.example.gamedemo;
 
+import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
-import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Controller {
-    private menuController menuContr = new menuController();
+public class Controller implements gameListener{
+    private final menuController menuContr = new menuController();
     public static int Width = 800;
     public static int Height = 600;
 
-    private ScoreBoard scoreBoard;
-    public int points = 0;
+    private boolean UPpressed = false, LEFTpressed = false,
+            RIGHTpressed = false, Apressed = false, SPACEpressed = false, SPACEreleased = true;
+
+    public int score = 0;
     public boolean surprise = true;
+
     @FXML
-    private ListView<String> scoreBoardList;
-    Pane pane = new Pane();
+    Pane gamePane;
     @FXML
     private BorderPane menuContainer;
+    @FXML
     private Pane newGamePane, savePane;
+    @FXML
+    private ScoreBoard scoreBoard;
+    @FXML
+    private ListView<String> scoreBoardList;
+    @FXML
+    private Text currentScore, livesLeft;
+
+
+    private Timer timer = new Timer();
+    private gameLoop game;
     List<Bullets> bullets = new ArrayList<>();
     List<Bullets> bullets1 = new ArrayList<>();
-    List<Asteroids> asteroids = new ArrayList<>();
     List<Alien> aliens = new ArrayList<>();
+    private List<Character> character = new ArrayList<>();
+    List<Asteroids> asteroids = new ArrayList<>();
     double Rotation = 0;
-    private AnimationTimer timer;
+    private long lastBulletTime = System.nanoTime();
+
 
     public void initialize() {
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        executor.scheduleAtFixedRate(this::startGame, 0, 16, TimeUnit.MILLISECONDS);
+
         scoreBoard = new ScoreBoard("saves", "score_saves");
 
         // loads scoreboard from file and updates view
         updateScoreBoard();
 
-
-        // renders all the objects on screen
-        pane.setStyle("-fx-background-color: black;");
-        pane.setPrefSize(Width, Height);
-        Ship ship = new Ship(Width / 2, Height / 2);
-        Text text = new Text(10, 20, "Points:" + points);
-        pane.getChildren().add(ship.getCharacter());
-        pane.getChildren().add(text);
-
-        Random rnd = new Random();
-
-        while (asteroids.size() < 10) {
-            Asteroids asteroid = new Asteroids(rnd.nextInt(1000), rnd.nextInt(1000), rnd.nextInt(1, 4));
-            asteroids.add(asteroid);
-        }
-        asteroids.forEach(asteroid -> {
-            pane.getChildren().add(asteroid.getCharacter());
-        });
-
-        Map<KeyCode, Boolean> pressedKey = new HashMap<>();
-        pane.setOnKeyPressed(keyEvent -> {
-            pressedKey.put(keyEvent.getCode(), Boolean.TRUE);
-        });
-        pane.setOnKeyReleased(keyEvent -> {
-            pressedKey.put(keyEvent.getCode(), Boolean.FALSE);
-        });
+        gamePane.setStyle("-fx-background-color: black;");
+        gamePane.setPrefSize(Width, Height);
 
 
-        newGamePane = getMenuPane("newGame.fxml");
+        // initalize menu view
+        newGamePane = getMenuPane("/newGame.fxml");
+        savePane = getMenuPane("/gameOver.fxml");
         menuContr.init(this);
 
+        // Propt user with welcome screen
         changeMenu("newGame.fxml");
 
-        timer = new AnimationTimer() {
-
-            private long lastUpdate = 0;
-            private long lastbullets = 0;
-            @Override
-
-            public void handle(long now) {
-                pane.setStyle("-fx-background-color: black;");
-
-                // controls spaceship actions
-                if (pressedKey.getOrDefault(KeyCode.A, false)) {
-                    ship.Hyperspace();
-                }
-                if (pressedKey.getOrDefault(KeyCode.LEFT, false)) {
-                    ship.turnLeft();
-                }
-                if (pressedKey.getOrDefault(KeyCode.RIGHT, false)) {
-                    ship.turnRight();
-                }
-                if (pressedKey.getOrDefault(KeyCode.UP, false)) {
-                    ship.acc();
-                }
-                if (pressedKey.getOrDefault(KeyCode.SPACE, false) && (now - lastUpdate > 330_000_000)) {
-                    Bullets bullet = new Bullets((int) (ship.getCharacter().getTranslateX()), (int) (ship.getCharacter().getTranslateY()));
-                    bullet.getCharacter().setRotate(ship.getCharacter().getRotate());
-                    bullets.add(bullet);
-                    bullet.acc();
-                    pane.getChildren().add(bullet.getCharacter());
-                    lastUpdate = now;
-                }
-
-                // spawning and firing of bullets from an alien enemy in the game
-                if (rnd.nextInt(100) < 2 && aliens.size() == 0) {
-                    Alien alien = new Alien(1, rnd.nextInt(100, 900));
-                    aliens.add(alien);
-                    pane.getChildren().add(alien.getCharacter());
-                }
-                if (aliens.size() == 1) {
-                    while (now - lastbullets > 440_000_000 && aliens.size() > 0) {
-                        Bullets bullet1 = new Bullets((int) (aliens.get(0).getCharacter().getTranslateX()), (int) (aliens.get(0).getCharacter().getTranslateY()));
-                        bullet1.getCharacter().setRotate(Rotation += 60);
-                        bullets1.add(bullet1);
-                        bullet1.acc();
-                        pane.getChildren().add(bullet1.getCharacter());
-                        lastbullets = now;
-                    }
-                    aliens.get(0).move();
-                }
-                ship.move();
-                asteroids.forEach(asteroid -> {
-                    asteroid.move();
-
-                });
-                bullets.forEach(bullet -> {
-                    bullet.move();
-                });
-                bullets1.forEach(bullet1 -> {
-                    bullet1.move();
-                });
-                bullets.forEach(bullet -> {
-                    asteroids.forEach(asteroid -> {
-                        if (asteroid.collide(bullet)) {
-                            if (asteroid.getLevel() == 1) {
-                                points += 10;
-                                text.setText("Points:" + points);
-                            }
-                            if (asteroid.getLevel() != 1) {
-                                double X = asteroid.getCharacter().getTranslateX();
-                                double Y = asteroid.getCharacter().getTranslateY();
-                                int Z = asteroid.getLevel();
-                                Downgrade((int) X + 10, (int) Y + 10, Z);
-                                Downgrade((int) X - 10, (int) Y - 10, Z);
-                            }
-                            pane.getChildren().remove(asteroid.getCharacter());
-                            asteroids.remove(asteroid);
-                            pane.getChildren().remove(bullet.getCharacter());
-                            bullets.remove(bullet);
-                        }
-                    });
-                });
-                bullets.forEach(bullet -> {
-                    aliens.forEach(alien -> {
-                        if (alien.collide(bullet)) {
-                            pane.getChildren().remove(alien.getCharacter());
-                            aliens.remove(alien);
-                            pane.getChildren().remove(bullet.getCharacter());
-                            bullets.remove(bullet);
-                            bullets1.forEach(bullet1 -> {
-                                pane.getChildren().remove(bullet1.getCharacter());
-                            });
-                            surprise = false;
-                            bullets1.clear();
-                            points += 100;
-                            text.setText("Points:" + points);
-                        }
-                    });
-                });
-            }
-        };
-    };
-
-
-    public void Downgrade(int x,int y,int z){
-        Asteroids asteroid = new Asteroids(x,y,z-1);
-        asteroids.add(asteroid);
-        pane.getChildren().add(asteroid.getCharacter());
-
     }
+
+
+    private class Timer extends AnimationTimer {
+        @Override
+        public void handle(long now) {
+            gamePane.setStyle("-fx-background-color: black;");
+            game.Loop(now);
+            renderChar();
+            shipAction(game.ship);
+    };
+    }
+
+    public void renderChar(){
+        spawnAsteroids();
+        spawnAlien();
+        moveGameObjects();
+    }
+
+    private void spawnAsteroids() {
+        Random rnd = new Random();
+
+        while (character instanceof Asteroids && character.size() < 10) {
+            Asteroids asteroid = new Asteroids(rnd.nextInt(1000), rnd.nextInt(1000), rnd.nextInt(1, 4));
+            character.add(asteroid);
+        }
+
+        character.forEach(asteroid -> {
+            gamePane.getChildren().add(asteroid.getCharacter());
+        });
+    }
+
+    private void spawnAlien() {
+        Random rnd = new Random();
+
+        if (rnd.nextInt(100) < 2 && aliens.size() == 0) {
+            Alien alien = new Alien(1, rnd.nextInt(100, 900));
+            aliens.add(alien);
+            gamePane.getChildren().add(alien.getCharacter());
+        }
+    }
+
+    private void moveGameObjects() {
+        long now = System.nanoTime();
+
+        if (aliens.size() == 1) {
+            if (now - lastBulletTime > 440_000_000 && aliens.size() > 0) {
+                spawnAlienBullet();
+                lastBulletTime = now;
+            }
+            aliens.get(0).move();
+        }
+        game.ship.move();
+        asteroids.forEach(Asteroids::move);
+        bullets.forEach(Bullets::move);
+        bullets1.forEach(Bullets::move);
+    }
+
+    private void spawnAlienBullet() {
+        Bullets bullet1 = new Bullets((int) (aliens.get(0).getCharacter().getTranslateX()), (int) (aliens.get(0).getCharacter().getTranslateY()));
+        bullet1.getCharacter().setRotate(Rotation += 60);
+        bullets1.add(bullet1);
+        bullet1.acc();
+        gamePane.getChildren().add(bullet1.getCharacter());
+    }
+
+    private void shipAction(Ship ship) {
+        gamePane.setOnKeyPressed(this::handleKeyPressed);
+        gamePane.setOnKeyReleased(this::handleKeyReleased);
+
+        Duration frameTime = Duration.millis(1000 / 60); // 60 FPS
+        KeyFrame keyFrame = new KeyFrame(frameTime, e -> updateShip(ship));
+        Timeline timeline = new Timeline(keyFrame);
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+    }
+
+    private void updateShip(Ship ship) {
+        if (UPpressed) {
+            ship.acc();
+        }
+        if (LEFTpressed) {
+            ship.turnLeft();
+        }
+        if (RIGHTpressed) {
+            ship.turnRight();
+        }
+        if (Apressed) {
+            ship.Hyperspace();
+        }
+//        if (SPACEpressed && SPACEreleased ) {
+//            gameLoop.ship.shoot();
+//            SPACEreleased = false;
+//        }
+    }
+
+    @FXML
+    private void handleKeyPressed(KeyEvent event) {
+        switch (event.getCode()) {
+            case UP:
+                UPpressed = true;
+                break;
+            case LEFT:
+                LEFTpressed = true;
+                break;
+            case RIGHT:
+                RIGHTpressed = true;
+                break;
+            case A:
+                Apressed = true;
+                break;
+            case SPACE:
+                SPACEpressed = true;
+            default:
+                break;
+        }
+    }
+    @FXML
+    private void handleKeyReleased(KeyEvent event) {
+        switch (event.getCode()) {
+            case UP:
+                UPpressed = false;
+                break;
+            case LEFT:
+                LEFTpressed = false;
+                break;
+            case RIGHT:
+                RIGHTpressed = false;
+                break;
+            case A:
+                Apressed = false;
+                break;
+            case SPACE: {
+                SPACEpressed = false;
+                SPACEreleased = true;
+            }
+            default:
+                break;
+        }
+    }
+
 
     public void changeMenu(String s) {
         switch (s) {
@@ -199,11 +236,31 @@ public class Controller {
     }
 
     public void addScore(String playerName) {
-        scoreBoard.addScore(playerName,points);
+        scoreBoard.addScore(playerName,score);
         updateScoreBoard();
     }
 
+    @Override
+    public void livesLeftChanged(int livedLeft) {
+        this.livesLeft.setText(livesLeft + " lives left");
+    }
+    @Override
+    public void scoreChanged(int newScore) {
+        currentScore.setText("Score: " + newScore);
+    }
+
+    @Override
+    public void gameOver() {
+        UPpressed = false;
+        LEFTpressed = false;
+        RIGHTpressed = false;
+
+        menuContr.gameOver(game.getScore(), scoreBoard.getHighScore());
+    }
+
+
     public void startGame() {
+        game.initGame(this);
         scoreBoardList.requestFocus();
         timer.start();
 
@@ -219,5 +276,10 @@ public class Controller {
             return null;
         }
     }
+
+//    @Override
+//    public void gameOver() {
+//        menuContr.gameOver(gameLoop.getScore(), scoreBoard.getHighScore());
+//    }
 
 }

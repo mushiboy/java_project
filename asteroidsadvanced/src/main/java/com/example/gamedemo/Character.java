@@ -46,16 +46,16 @@ public class Character {
         this.character.setTranslateY(this.character.getTranslateY()+ this.movement.getY());
 
         if (this.character.getTranslateX() < 0){
-            this.character.setTranslateX(this.character.getTranslateX() + myGame.Width);
+            this.character.setTranslateX(this.character.getTranslateX() + Controller.Width);
         }
-        if (this.character.getTranslateX() > myGame.Width){
-            this.character.setTranslateX(this.character.getTranslateX() % myGame.Width);
+        if (this.character.getTranslateX() > Controller.Width){
+            this.character.setTranslateX(this.character.getTranslateX() % Controller.Width);
         }
         if (this.character.getTranslateY() < 0){
-            this.character.setTranslateY(this.character.getTranslateY() + myGame.Height);
+            this.character.setTranslateY(this.character.getTranslateY() + Controller.Height);
         }
-        if (this.character.getTranslateY() > myGame.Height){
-            this.character.setTranslateY(this.character.getTranslateY() % myGame.Height);
+        if (this.character.getTranslateY() > Controller.Height){
+            this.character.setTranslateY(this.character.getTranslateY() % Controller.Height);
         }
 
     }

@@ -11,14 +11,17 @@ import java.util.regex.Pattern;
 public class menuController {
     Controller controller;
     @FXML
-    private Button newGameButton,saveButton,dontSaveButton;
+    private Button newGameButton, saveButton, dontSaveButton;
+    @FXML
+    private Text saveInfoText, largeScoreEnd, smallScoreEnd;
     @FXML
     private TextField playerName;
     @FXML
-    private Text saveInfoText, scoreTextSmall, scoreTextLarge;
+    private Text saveInfo;
 
     public void init(Controller controller){
         this.controller = controller;
+
         initKeyHandles();
     }
 
@@ -79,13 +82,12 @@ public class menuController {
 
 
     public void gameOver(int score, int highscore) {
-        controller.changeMenu("newGame.fxml");
+        controller.changeMenu("gameOver.fxml");
         newGameButton.setDefaultButton(false);
-
         playerName.requestFocus();
         saveButton.setDefaultButton(true);
         dontSaveButton.setCancelButton(true);
-        scoreTextLarge.setText(score > highscore ? "New Highscore!" : "Game over!");
-        scoreTextSmall.setText("Score: " + score);
+        largeScoreEnd.setText(score > highscore ? "New Highscore!" : "Game over!");
+        smallScoreEnd.setText("Score: " + score);
     }
 }
