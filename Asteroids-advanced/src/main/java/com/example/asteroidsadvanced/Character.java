@@ -7,6 +7,7 @@ import javafx.scene.shape.Shape;
 
 // Define a Character class
 public class Character {
+    private int size;
 
     // Define private instance variables
     private Point2D movement;
@@ -68,16 +69,16 @@ public class Character {
 
         // Wrap the character around the screen if it goes off the edge
         if (this.character.getTranslateX() < 0){
-            this.character.setTranslateX(this.character.getTranslateX() + myGame.Width);
+            this.character.setTranslateX(this.character.getTranslateX() + Game.Width);
         }
-        if (this.character.getTranslateX() > myGame.Width){
-            this.character.setTranslateX(this.character.getTranslateX() % myGame.Width);
+        if (this.character.getTranslateX() > Game.Width){
+            this.character.setTranslateX(this.character.getTranslateX() % Game.Width);
         }
         if (this.character.getTranslateY() < 0){
-            this.character.setTranslateY(this.character.getTranslateY() + myGame.Height);
+            this.character.setTranslateY(this.character.getTranslateY() + Game.Height);
         }
-        if (this.character.getTranslateY() > myGame.Height){
-            this.character.setTranslateY(this.character.getTranslateY() % myGame.Height);
+        if (this.character.getTranslateY() > Game.Height){
+            this.character.setTranslateY(this.character.getTranslateY() % Game.Height);
         }
 
     }
@@ -90,4 +91,9 @@ public class Character {
             return false;
         }
     }
+
+    public int getSize(){
+        return this.size;
+    }
+
 }
