@@ -11,6 +11,8 @@ public class Alien extends Character{
     Timeline timeline = new Timeline();
     int X = 0;
     int Y = 0;
+    private int size = 4;
+
     public Alien(int x, int y) {
         super(new Polygon( 130, 50, 110, 80, 0, 80, -20, 50, 20, 50, 30, 30, 80, 30, 90,50), x, y);
         super.setMovement(0.1,0.1);
@@ -30,12 +32,5 @@ public class Alien extends Character{
         timeline.setAutoReverse(true);
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
-    }
-
-
-
-    public boolean collide(Character other){
-        Shape collisionArea = Shape.intersect(super.getCharacter(), other.getCharacter());
-        return collisionArea.getBoundsInLocal().getWidth() != -1;
     }
 }

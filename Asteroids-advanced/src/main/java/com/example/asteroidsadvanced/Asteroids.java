@@ -8,12 +8,12 @@ import java.util.Random;
 
 public class Asteroids extends Character{
     private double rotationalMovement;
-    private int level;
+    private int size;
     int accelerationAmount;
     private Random rnd = new Random();
     public Asteroids(int x, int y, int z) {
         super(new Polygon(25.0*z, 0.0, 50.0*z, 15.0*z, 40.0*z, 40.0*z, 10.0*z, 40.0*z, 0.0, 15.0*z), x, y);
-        this.level = z;
+        this.size = z;
         super.setMovement(0.1,0.1);
         Random rnd = new Random();
         super.getCharacter().setRotate(rnd.nextInt(360));
@@ -31,14 +31,12 @@ public class Asteroids extends Character{
         super.getCharacter().setRotate(super.getCharacter().getRotate() + this.rotationalMovement);
     }
 
-    public int getLevel(){
-        return this.level;
+    public int getSize(){
+        return this.size;
     }
 
     public boolean collide(Character other){
         Shape collisionArea = Shape.intersect(super.getCharacter(), other.getCharacter());
         return collisionArea.getBoundsInLocal().getWidth() != -1;
     }
-
-
 }
