@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="680.0" prefWidth="1100.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.game23.Controller">
+   <Pane fx:id="gamePane" layoutX="14.0" layoutY="80.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: white;">
+      <BorderPane fx:id="menuContainer" prefHeight="600.0" prefWidth="800.0" />
+   </Pane>
+   <Pane layoutX="841.0" layoutY="15.0" prefHeight="434.0" prefWidth="239.0" style="-fx-border-color: white;">
+      <Text fill="WHITE" layoutX="17.0" layoutY="42.0" stroke="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="HIGH SCORES" textAlignment="CENTER" wrappingWidth="195.89164753802777">
+         <font>
+            <Font size="25.0" />
+         </font>
+      </Text>
+      <ListView fx:id="scoreBoardList" focusTraversable="false" layoutX="14.0" layoutY="48.0" maxHeight="-Infinity" maxWidth="-Infinity" onKeyPressed="#setPressedKey" onKeyReleased="#setReleasedKey" prefHeight="352.0" prefWidth="214.0" style="-fx-border-color: white; -fx-background-color: black;" />
+   </Pane>
+   <Pane layoutX="839.0" layoutY="457.0" prefHeight="202.0" prefWidth="241.0" style="-fx-border-color: white;">
+      <Text fill="WHITE" layoutX="13.0" layoutY="34.0" stroke="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="CONTROL TABLE" textAlignment="CENTER" wrappingWidth="212.86773354737227">
+         <font>
+            <Font size="25.0" />
+         </font>
+      </Text>
+      <Text fill="WHITE" layoutX="22.0" layoutY="54.0" stroke="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="A - Hyperspace;   Up - Ship Accelerate;   Down - Ship Slowdown;   Right - Ship Turn Right;   Left - Ship Turn Left;   Space - Ship Shoot" textAlignment="CENTER" wrappingWidth="203.93633706299727">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Text>
+   </Pane>
+   <Text fx:id="livesLeft" fill="WHITE" layoutX="337.0" layoutY="55.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="LIVES" wrappingWidth="333.7642517089844">
+      <font>
+         <Font size="32.0" />
+      </font>
+   </Text>
+   <Text fx:id="currentScore" fill="WHITE" layoutX="30.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="SCORE" wrappingWidth="296.74688720703125">
+      <font>
+         <Font size="32.0" />
+      </font>
+   </Text>
+</AnchorPane>
