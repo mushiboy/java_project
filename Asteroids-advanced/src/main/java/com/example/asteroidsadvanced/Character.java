@@ -46,6 +46,8 @@ public class Character {
         this.character.setRotate(this.character.getRotate() - 1);
     }
 
+    private static final double Max_Speed = 5.0;
+
     // Method to accelerate the character in the current direction
     public void acc(){
 
@@ -57,7 +59,14 @@ public class Character {
         double Y = Math.sin(angle) * 0.005;
 
         // Update the movement vector with the new components
-        this.movement = this.movement.add(X,Y);
+        Point2D acceleration = new Point2D(X, Y);
+        this.movement = this.movement.add(acceleration);
+
+        //Code for speed.
+        double speed = this.movement.magnitude();
+        if (speed > Max_Speed) {
+            this.movement = this.movement.normalize().multiply(Max_Speed);
+        }
     }
 
     // Method to move the character based on the current movement vector

@@ -61,7 +61,11 @@ public class Game extends Application {
             private int currentLevelIndex = 0;
 
             public void handle(long now){
-                if(pressedKey.getOrDefault(KeyCode.A,false)){ship.Hyperspace();}
+                if(pressedKey.getOrDefault(KeyCode.A,false)){
+                    pressedKey.remove(KeyCode.A);
+                    ship.Hyperspace();
+                }
+
                 if(pressedKey.getOrDefault(KeyCode.LEFT, false)){ship.turnLeft();}
                 if(pressedKey.getOrDefault(KeyCode.RIGHT,false)){ship.turnRight();}
                 if(pressedKey.getOrDefault(KeyCode.UP,false)){ship.acc();}
@@ -73,6 +77,18 @@ public class Game extends Application {
                     pane.getChildren().add(bullet.getCharacter());
                     lastUpdate = now;
                 }
+
+                //if(enemies.size() > 1) {
+                    //while(now - lastbullets > 440_000_000 && enemies.size() > 0) {
+                        //Bullets bullet1 = new Bullets((int)(enemies.get(0).getCharacter().getTranslateX()), (int)(enemies.get(0).getCharacter().getTranslateY()));
+                        //var diff_y = ship.getCharacter().getTranslateX() - enemies.get(0).getCharacter().getTranslateX();
+                        //var diff_x = ship.getCharacter().getTranslateY() - enemies.get(0).getCharacter().getTranslateY();
+                        //var angle = Math.toDegrees(Math.atan2(diff_x, diff_y));
+                        //bullet1.getCharacter().setRotate(angle);
+                        //bullets1.add(bullet1);
+                        //bullet1.acc();
+                        //pane.getChildren().add(bullet1.getCharacter());
+                        //lastbullets = now;}}
 
                 ship.move();
                 enemies.forEach(enemy -> {
@@ -138,7 +154,16 @@ public class Game extends Application {
                         text.setText("You Win!");
                         return;
                     }
+                    bullets.forEach(bullet -> {
+                        pane.getChildren().remove(bullet.getCharacter());
+                    });
                     bullets.clear();
+                    
+                    bullets1.forEach(bullet -> {
+                        pane.getChildren().remove(bullet.getCharacter());
+                    });
+                    bullets1.clear();
+
                     enemies.clear();
                     enemies = levels[currentLevelIndex].getEnemyList();
                     enemies.forEach(enemy -> {
