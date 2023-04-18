@@ -1,35 +1,41 @@
 package com.example.asteroidsadvanced;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
-import java.security.Key;
+import javafx.util.Duration;
 import java.util.*;
 
-public class Game extends Application {
+public class MyGame extends Application {
     public static int Width = 1980;
     public static int Height = 1080;
     public int points = 0;
 
-    List<Bullets> bullets = new ArrayList<>();
-    List<Bullets> bullets1 = new ArrayList<>();
+    List<Bullet> bullets = new ArrayList<>();
+    List<Bullet> bullets1 = new ArrayList<>();
     List<Character> enemies = new ArrayList<>();
 
-    Pane pane = new Pane();
+    static Pane pane = new Pane();
     Pane end_pane = new Pane();
     double Rotation = 0;
+
+    static Ship ship = new Ship(Width/3,Height/3);
+    static Timeline timeline = new Timeline();
 
     @Override
     public void start(Stage stage) throws Exception {
         Random rnd = new Random();
         pane.setPrefSize(Width, Height);
-        Ship ship = new Ship(Width/2,Height/2);
+
         pane.getChildren().add(ship.getCharacter());
         Text text = new Text(10,20,"Points:"+points);
         pane.getChildren().add(text);
@@ -41,6 +47,8 @@ public class Game extends Application {
         enemies.forEach(enemy -> {
             pane.getChildren().add(enemy.getCharacter());
         });
+        //Adding invincibility to ship
+        addInvincibility(5);
 
         Scene scene = new Scene(pane);
         Scene endgame = new Scene(end_pane);
@@ -63,14 +71,35 @@ public class Game extends Application {
             public void handle(long now){
                 if(pressedKey.getOrDefault(KeyCode.A,false)){
                     pressedKey.remove(KeyCode.A);
-                    ship.Hyperspace();
-                }
+                    boolean collision;
+                    timeline.stop();
 
+                    do {
+                        collision=false;
+                        ship.Hyperspace();
+                        for (Character enemy : enemies) {
+                            if (enemy.collide(ship)) {
+                                collision=true;
+                                break;
+                            }
+                        }
+                        for (Bullet bullet : bullets1) {
+                            if (ship.collide(bullet)) {
+                                collision=true;
+                                break;
+                            }
+                        }
+                    } while(collision);
+                    addInvincibility(5);
+                }
                 if(pressedKey.getOrDefault(KeyCode.LEFT, false)){ship.turnLeft();}
                 if(pressedKey.getOrDefault(KeyCode.RIGHT,false)){ship.turnRight();}
-                if(pressedKey.getOrDefault(KeyCode.UP,false)){ship.acc();}
+                if(pressedKey.getOrDefault(KeyCode.UP,false)){
+                    ship.setHyperspaced(false);
+                    ship.acc();
+                }
                 if(pressedKey.getOrDefault(KeyCode.SPACE, false) && (now - lastUpdate >330_000_000)){
-                    Bullets bullet = new Bullets((int)(ship.getCharacter().getTranslateX()),(int)(ship.getCharacter().getTranslateY()));
+                    Bullet bullet = new Bullet((int)(ship.getCharacter().getTranslateX()),(int)(ship.getCharacter().getTranslateY()));
                     bullet.getCharacter().setRotate(ship.getCharacter().getRotate());
                     bullets.add(bullet);
                     bullet.acc();
@@ -78,34 +107,34 @@ public class Game extends Application {
                     lastUpdate = now;
                 }
 
-                //if(enemies.size() > 1) {
-                    //while(now - lastbullets > 440_000_000 && enemies.size() > 0) {
-                        //Bullets bullet1 = new Bullets((int)(enemies.get(0).getCharacter().getTranslateX()), (int)(enemies.get(0).getCharacter().getTranslateY()));
-                        //var diff_y = ship.getCharacter().getTranslateX() - enemies.get(0).getCharacter().getTranslateX();
-                        //var diff_x = ship.getCharacter().getTranslateY() - enemies.get(0).getCharacter().getTranslateY();
-                        //var angle = Math.toDegrees(Math.atan2(diff_x, diff_y));
-                        //bullet1.getCharacter().setRotate(angle);
-                        //bullets1.add(bullet1);
-                        //bullet1.acc();
-                        //pane.getChildren().add(bullet1.getCharacter());
-                        //lastbullets = now;}}
-
-                ship.move();
                 enemies.forEach(enemy -> {
-                    enemy.move();
-
-                });
-
-                enemies.forEach(enemy -> {
-                    if(enemy.collide(ship)){
-                        pane.getChildren().remove(ship.getCharacter());
-                        stage.setScene(endgame);
-                        text.setText("Game Over");
+                    if(enemy.getSize() == 4) {
+                        while(now - lastbullets > 440_000_000) {
+                            Bullet bullet1 = new Bullet((int)(enemy.getCharacter().getTranslateX()), (int)(enemy.getCharacter().getTranslateY()));
+                            var diff_y = ship.getCharacter().getTranslateX() - enemy.getCharacter().getTranslateX();
+                            var diff_x = ship.getCharacter().getTranslateY() - enemy.getCharacter().getTranslateY();
+                            var angle = Math.toDegrees(Math.atan2(diff_x, diff_y));
+                            bullet1.getCharacter().setRotate(angle);
+                            bullets1.add(bullet1);
+                            bullet1.acc();
+                            pane.getChildren().add(bullet1.getCharacter());
+                            lastbullets = now;
+                        }
                     }
                 });
+
+                if (!ship.isHyperspaced()) {
+                    ship.move();
+                }
+
                 enemies.forEach(enemy -> {
-                    if(enemy.collide(ship)){
+                    enemy.move();
+                });
+
+                enemies.forEach(enemy -> {
+                    if(enemy.collide(ship)  && !ship.isInvincible()){
                         pane.getChildren().remove(ship.getCharacter());
+                        stage.setScene(endgame);
                         text.setText("Game Over");
                     }
                 });
@@ -116,6 +145,18 @@ public class Game extends Application {
                 
                 bullets1.forEach(bullet1 -> {
                     bullet1.move();
+                });
+
+                bullets1.forEach(bullet ->{
+                    if(ship.collide(bullet) && !ship.isInvincible()){
+                        pane.getChildren().remove(ship.getCharacter());
+                        pane.getChildren().remove(bullet.getCharacter());
+                        bullets.remove(bullet);
+                        bullets1.forEach(bullet1 -> {
+                            pane.getChildren().remove(bullet1.getCharacter());
+                        });
+                        text.setText("Game Over:"+points);
+                    }
                 });
 
                 bullets.forEach(bullet -> {
@@ -132,15 +173,15 @@ public class Game extends Application {
                             if(enemy.getSize() == 4){
                                 points += 100;
                                 text.setText("Points:"+points);
-                                bullets1.clear();
                                 bullets1.forEach(bullet1 -> {
                                     pane.getChildren().remove(bullet1.getCharacter());
                                 });
+                                bullets1.clear();
                             }
-                            pane.getChildren().remove(enemy.getCharacter());
-                            enemies.remove(enemy);
                             pane.getChildren().remove(bullet.getCharacter());
                             bullets.remove(bullet);
+                            pane.getChildren().remove(enemy.getCharacter());
+                            enemies.remove(enemy);
                         }
                     });
                 });
@@ -175,11 +216,22 @@ public class Game extends Application {
     }
 
     public void Downgrade(int x,int y,int z){
-        Asteroids asteroid = new Asteroids(x,y,z-1);
+        Asteroid asteroid = new Asteroid(x,y,z-1);
         enemies.add(asteroid);
         pane.getChildren().add(asteroid.getCharacter());
     }
-
+    public static void addInvincibility(int seconds) {
+        ship.setInvincible(true);
+        Circle circle = new Circle(60);
+        timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(seconds), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                ship.setInvincible(false); // Set the ship as not invincible after the duration
+                timeline.stop();
+            }
+        }));
+        timeline.play();
+    }
     public static void main(String[] args){
         launch(args);
     }

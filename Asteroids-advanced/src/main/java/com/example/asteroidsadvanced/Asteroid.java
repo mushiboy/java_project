@@ -2,16 +2,15 @@ package com.example.asteroidsadvanced;
 
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
-import javafx.scene.transform.Rotate;
 
 import java.util.Random;
 
-public class Asteroids extends Character{
+public class Asteroid extends Character{
     private double rotationalMovement;
     private int size;
     int accelerationAmount;
     private Random rnd = new Random();
-    public Asteroids(int x, int y, int z) {
+    public Asteroid(int x, int y, int z) {
         super(new Polygon(25.0*z, 0.0, 50.0*z, 15.0*z, 40.0*z, 40.0*z, 10.0*z, 40.0*z, 0.0, 15.0*z), x, y);
         this.size = z;
         super.setMovement(0.1,0.1);

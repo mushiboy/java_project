@@ -4,10 +4,10 @@ package com.example.asteroidsadvanced;
 import javafx.scene.shape.Polygon;
 
 // define a Bullets class that extends the Character class
-public class Bullets extends Character{
+public class Bullet extends Character{
 
     // constructor method for Bullets class that takes two integers as arguments
-    public Bullets( int x, int y) {
+    public Bullet( int x, int y) {
         // create a new Polygon object with 4 points and pass it to the parent Character class constructor along with the x and y arguments
         super(new Polygon(5,-5,5,5,-5,5,-5,-5), x+50, y+30);
     }
@@ -32,4 +32,3 @@ public class Bullets extends Character{
         super.setMovement(X,Y);
     }
 }
-

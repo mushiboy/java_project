@@ -55,8 +55,8 @@ public class Character {
         double angle = Math.toRadians(this.character.getRotate());
 
         // Calculate the X and Y components of the movement vector based on the angle and a fixed acceleration rate
-        double X = Math.cos(angle) * 0.005;
-        double Y = Math.sin(angle) * 0.005;
+        double X = Math.cos(angle) * 0.01;
+        double Y = Math.sin(angle) * 0.01;
 
         // Update the movement vector with the new components
         Point2D acceleration = new Point2D(X, Y);
@@ -78,22 +78,22 @@ public class Character {
 
         // Wrap the character around the screen if it goes off the edge
         if (this.character.getTranslateX() < 0){
-            this.character.setTranslateX(this.character.getTranslateX() + Game.Width);
+            this.character.setTranslateX(this.character.getTranslateX() + MyGame.Width);
         }
-        if (this.character.getTranslateX() > Game.Width){
-            this.character.setTranslateX(this.character.getTranslateX() % Game.Width);
+        if (this.character.getTranslateX() > MyGame.Width){
+            this.character.setTranslateX(this.character.getTranslateX() % MyGame.Width);
         }
         if (this.character.getTranslateY() < 0){
-            this.character.setTranslateY(this.character.getTranslateY() + Game.Height);
+            this.character.setTranslateY(this.character.getTranslateY() + MyGame.Height);
         }
-        if (this.character.getTranslateY() > Game.Height){
-            this.character.setTranslateY(this.character.getTranslateY() % Game.Height);
+        if (this.character.getTranslateY() > MyGame.Height){
+            this.character.setTranslateY(this.character.getTranslateY() % MyGame.Height);
         }
 
     }
 
     public boolean collide(Character other) {
-        if (other instanceof Asteroids) {
+        if (other instanceof Character) {
             Shape collisionArea = Shape.intersect(this.getCharacter(), other.getCharacter());
             return collisionArea.getBoundsInLocal().getWidth() != -1;
         } else {
@@ -104,5 +104,4 @@ public class Character {
     public int getSize(){
         return this.size;
     }
-
 }

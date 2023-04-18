@@ -2,7 +2,6 @@ package com.example.asteroidsadvanced;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
-import javafx.animation.PathTransition;
 import javafx.animation.Timeline;
 import javafx.scene.shape.*;
 import javafx.util.Duration;
@@ -32,5 +31,9 @@ public class Alien extends Character{
         timeline.setAutoReverse(true);
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
+    }
+
+    public int getSize(){
+        return this.size;
     }
 }
