@@ -38,12 +38,12 @@ public class Character {
 
     // Method to turn the character to the right
     public void turnRight(){
-        this.character.setRotate(this.character.getRotate() + 1);
+        this.character.setRotate(this.character.getRotate() + 2);
     }
 
     // Method to turn the character to the left
     public void turnLeft(){
-        this.character.setRotate(this.character.getRotate() - 1);
+        this.character.setRotate(this.character.getRotate() - 2);
     }
 
     private static final double Max_Speed = 5.0;
@@ -55,8 +55,8 @@ public class Character {
         double angle = Math.toRadians(this.character.getRotate());
 
         // Calculate the X and Y components of the movement vector based on the angle and a fixed acceleration rate
-        double X = Math.cos(angle) * 0.01;
-        double Y = Math.sin(angle) * 0.01;
+        double X = Math.cos(angle) * 0.05;
+        double Y = Math.sin(angle) * 0.05;
 
         // Update the movement vector with the new components
         Point2D acceleration = new Point2D(X, Y);
