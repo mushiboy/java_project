@@ -9,7 +9,6 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -21,7 +20,7 @@ public class MyGame extends Application {
     public int points = 0;
 
     List<Bullet> bullets = new ArrayList<>();
-    List<Bullet> bullets1 = new ArrayList<>();
+    List<Bullet> alien_bullets = new ArrayList<>();
     List<Character> enemies = new ArrayList<>();
 
     static Pane pane = new Pane();
@@ -83,7 +82,7 @@ public class MyGame extends Application {
                                 break;
                             }
                         }
-                        for (Bullet bullet : bullets1) {
+                        for (Bullet bullet : alien_bullets) {
                             if (ship.collide(bullet)) {
                                 collision=true;
                                 break;
@@ -110,14 +109,14 @@ public class MyGame extends Application {
                 enemies.forEach(enemy -> {
                     if(enemy.getSize() == 4) {
                         while(now - lastbullets > 440_000_000) {
-                            Bullet bullet1 = new Bullet((int)(enemy.getCharacter().getTranslateX()), (int)(enemy.getCharacter().getTranslateY()));
+                            Bullet a_bullet = new Bullet((int)(enemy.getCharacter().getTranslateX()), (int)(enemy.getCharacter().getTranslateY()));
                             var diff_y = ship.getCharacter().getTranslateX() - enemy.getCharacter().getTranslateX();
                             var diff_x = ship.getCharacter().getTranslateY() - enemy.getCharacter().getTranslateY();
                             var angle = Math.toDegrees(Math.atan2(diff_x, diff_y));
-                            bullet1.getCharacter().setRotate(angle);
-                            bullets1.add(bullet1);
-                            bullet1.acc();
-                            pane.getChildren().add(bullet1.getCharacter());
+                            a_bullet.getCharacter().setRotate(angle);
+                            alien_bullets.add(a_bullet);
+                            a_bullet.acc();
+                            pane.getChildren().add(a_bullet.getCharacter());
                             lastbullets = now;
                         }
                     }
@@ -143,48 +142,57 @@ public class MyGame extends Application {
                     bullet.move();
                 });
                 
-                bullets1.forEach(bullet1 -> {
-                    bullet1.move();
+                alien_bullets.forEach(a_bullet -> {
+                    a_bullet.move();
                 });
 
-                bullets1.forEach(bullet ->{
+                alien_bullets.forEach(bullet ->{
                     if(ship.collide(bullet) && !ship.isInvincible()){
                         pane.getChildren().remove(ship.getCharacter());
                         pane.getChildren().remove(bullet.getCharacter());
                         bullets.remove(bullet);
-                        bullets1.forEach(bullet1 -> {
-                            pane.getChildren().remove(bullet1.getCharacter());
+                        alien_bullets.forEach(a_bullet -> {
+                            pane.getChildren().remove(a_bullet.getCharacter());
                         });
                         text.setText("Game Over:"+points);
                     }
                 });
 
-                bullets.forEach(bullet -> {
-                    enemies.forEach(enemy -> {
-                        if(enemy.collide(bullet)){
-                            if(enemy.getSize() == 1){points += 10;text.setText("Points:"+points);}
-                            if(enemy.getSize() == 2 || enemy.getSize() == 3){
+                Iterator<Bullet> bulletIterator = bullets.iterator();
+                List<Asteroid> newAsteroids = new ArrayList<>();
+                while (bulletIterator.hasNext()) {
+                    Bullet bullet = bulletIterator.next();
+                    Iterator<Character> enemyIterator = enemies.iterator();
+                    while (enemyIterator.hasNext()) {
+                        Character enemy = enemyIterator.next();
+                        if (enemy.collide(bullet)) {
+                            // handle collision
+                            if (enemy.getSize() == 1) {
+                                points += 10;
+                                text.setText("Points:" + points);
+                            } else if (enemy.getSize() == 2 || enemy.getSize() == 3) {
                                 double X = enemy.getCharacter().getTranslateX();
                                 double Y = enemy.getCharacter().getTranslateY();
                                 int Z = enemy.getSize();
-                                Downgrade((int)X+10,(int)Y+10,Z);
-                                Downgrade((int)X-10,(int)Y-10,Z);
-                            }
-                            if(enemy.getSize() == 4){
+                                newAsteroids.add(new Asteroid((int)X + 10, (int)Y + 10, Z - 1));
+                                newAsteroids.add(new Asteroid((int)X - 10, (int)Y - 10, Z - 1));
+                            } else if (enemy.getSize() == 4) {
                                 points += 100;
-                                text.setText("Points:"+points);
-                                bullets1.forEach(bullet1 -> {
-                                    pane.getChildren().remove(bullet1.getCharacter());
-                                });
-                                bullets1.clear();
+                                text.setText("Points:" + points);
+                                for (Bullet a_bullet : alien_bullets) {
+                                    pane.getChildren().remove(a_bullet.getCharacter());
+                                }
+                                alien_bullets.clear();
                             }
                             pane.getChildren().remove(bullet.getCharacter());
-                            bullets.remove(bullet);
+                            bulletIterator.remove();
                             pane.getChildren().remove(enemy.getCharacter());
-                            enemies.remove(enemy);
+                            enemyIterator.remove();
                         }
-                    });
-                });
+                    }
+                }
+                enemies.addAll(newAsteroids);
+                newAsteroids.forEach(asteroid -> pane.getChildren().add(asteroid.getCharacter()));
 
                 if (enemies.isEmpty()) {
                     currentLevelIndex++;
@@ -200,10 +208,10 @@ public class MyGame extends Application {
                     });
                     bullets.clear();
                     
-                    bullets1.forEach(bullet -> {
-                        pane.getChildren().remove(bullet.getCharacter());
+                    alien_bullets.forEach(a_bullet -> {
+                        pane.getChildren().remove(a_bullet.getCharacter());
                     });
-                    bullets1.clear();
+                    alien_bullets.clear();
 
                     enemies.clear();
                     enemies = levels[currentLevelIndex].getEnemyList();
@@ -220,9 +228,9 @@ public class MyGame extends Application {
         enemies.add(asteroid);
         pane.getChildren().add(asteroid.getCharacter());
     }
+
     public static void addInvincibility(int seconds) {
         ship.setInvincible(true);
-        Circle circle = new Circle(60);
         timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(seconds), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
