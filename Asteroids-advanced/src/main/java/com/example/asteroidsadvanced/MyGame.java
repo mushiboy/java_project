@@ -16,8 +16,8 @@ import javafx.util.Duration;
 import java.util.*;
 
 public class MyGame extends Application {
-    public static int Width = 800;
-    public static int Height = 600;
+    public static int Width = 1920;
+    public static int Height = 1080;
     public int points = 0;
 
     List<Bullet> bullets = new ArrayList<>();
