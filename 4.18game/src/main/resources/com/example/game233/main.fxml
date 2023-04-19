@@ -31,12 +31,12 @@
          </font>
       </Text>
    </Pane>
-   <Text fx:id="livesLeft" fill="WHITE" layoutX="337.0" layoutY="55.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="LIVES" wrappingWidth="333.7642517089844">
+   <Text fx:id="currentScore" fill="WHITE" layoutX="30.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="SCORE" wrappingWidth="296.74688720703125">
       <font>
          <Font size="32.0" />
       </font>
    </Text>
-   <Text fx:id="currentScore" fill="WHITE" layoutX="30.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="SCORE" wrappingWidth="296.74688720703125">
+   <Text fx:id="livesLeft" fill="WHITE" layoutX="338.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="LIVES" wrappingWidth="296.74688720703125">
       <font>
          <Font size="32.0" />
       </font>

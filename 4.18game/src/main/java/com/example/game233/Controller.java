@@ -2,22 +2,25 @@ package com.example.game233;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Timer;
+import java.util.stream.Collectors;
+
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
-import javafx.scene.input.KeyCode;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -27,8 +30,7 @@ public class Controller implements gameListener {
     public static int Height = 600;
     private int score = 0;
     private int lives = 3;
-    private final menuController menuContr = new menuController();
-    private Map<KeyCode, Boolean> pressedKey = new HashMap();
+    public menuController menuContr = new menuController();
 
     @FXML
     private BorderPane menuContainer;
@@ -38,94 +40,97 @@ public class Controller implements gameListener {
     private ListView<String> scoreBoardList;
     @FXML
     private Text currentScore,livesLeft;
+    Controller controller;
+    @FXML
+    private Button newGameButton;
+    @FXML
+    private Button saveButton;
+    @FXML
+    private Button dontSaveButton;
+    @FXML
+    private Text saveInfoText;
+    @FXML
+    private Text largeScoreEnd;
+    @FXML
+    private Text smallScoreEnd;
+    @FXML
+    private TextField playerName;
 
 
-    List<Bullets> bullets = new ArrayList();
-    List<Bullets> bullets1 = new ArrayList();
+    List<Bullets> bullets = new ArrayList<>();
+    List<Bullets> bullets1 = new ArrayList<>();
     List<Character> enemies = new ArrayList<>();
     private ScoreBoard scoreBoard;
-    double Rotation = 0.0;
-    public int points = 0;
 
     Ship ship;
-    Text text;
 
     private boolean UPpressed = false;
     private boolean LEFTpressed = false;
     private boolean RIGHTpressed = false;
-    private boolean SPACEpressed = false,SPACEreleased = true;
+    private boolean SPACEpressed = false, SPACEreleased = true;
+    private boolean Apressed = false;
+    private boolean DOWNpressed = false;
 
+    boolean collision;
 
     private long lastUpdate = 0;
-    private long lastbullets = 0;
+
     private int currentLevelIndex = 0;
     Level[] levels = Level.createLevels();
 
+    static Timeline timeline = new Timeline();
+
     public void initialize() {
-        this.scoreBoard = new ScoreBoard("saves", "score_saves");
-        this.updateScoreBoard();
+        scoreBoard = new ScoreBoard("saves", "score_saves");
+        updateScoreBoard();
 
-        this.newGamePane = this.getMenuPane("newGame.fxml");
-        this.savePane = this.getMenuPane("gameOver.fxml");
+        newGamePane = getMenuPane("newGame.fxml");
+        savePane = getMenuPane("gameOver.fxml");
 
-        this.menuContr.init(this);
-        this.changeMenu("newGame.fxml");
+        menuContr.init(this);
+        changeMenu("newGame.fxml");
     }
 
     public void initGame(gameListener gameListener) {
         this.gameListener = gameListener;
         gameListener.scoreChanged(this.score);
         gameListener.livesLeftChanged(this.lives);
-        this.scoreBoardList.requestFocus();
-
-        ship = new Ship(Width / 2, Height / 2);
-        text = new Text(10, 20, "Points:" + points);
-
-        this.gamePane.getChildren().add(this.ship.getCharacter());
-        this.gamePane.getChildren().add(this.text);
-
+        scoreBoardList.requestFocus();
 
         enemies = levels[0].getEnemyList();
-
-        enemies.forEach(enemy -> {
-            gamePane.getChildren().add(enemy.getCharacter());
-        });
 
     }
 
     public void startGame() {
         this.initGame(this);
 
-        startGameLoop(gamePane);
+        ship = new Ship(Width / 2, Height / 2);
+        this.gamePane.getChildren().add(this.ship.getCharacter());
+        addInvincibility(5,ship);
+
+        enemies.forEach(enemy -> {
+            gamePane.getChildren().add(enemy.getCharacter());
+        });
+
+        startGameLoop();
     }
-//    @FXML
-//    private void setupKeyHandlers() {
-//        gamePane.setOnKeyPressed(keyEvent -> {
-//            pressedKey.put(keyEvent.getCode(), Boolean.TRUE);
-//        });
-//        gamePane.setOnKeyReleased(keyEvent -> {
-//            pressedKey.put(keyEvent.getCode(), Boolean.FALSE);
-//        });
-//
-//    }
 
-
-    private void startGameLoop(Pane gamePane) {
+    private void startGameLoop() {
         new AnimationTimer() {
             @Override
             public void handle(long now) {
+                // set the ship controlling action
                 shipAction(now,ship);
 
-                ship.move();
-                enemies.forEach(enemy -> {
-                    enemy.move();
-                });
+                // move the ship on the gamePane
+                updateCharacters();
 
-                checkCollisions();
-
-                updateBullets(now);
-                checkBulletEnemyCollisions();
-                updateLevels();
+                gameListener.gameOver();
+                gamePane.getChildren().remove(ship.getCharacter());
+//
+//                checkCollisions();
+//
+//                updateLevels();
             }
         }.start();
     }
@@ -137,6 +142,8 @@ public class Controller implements gameListener {
             case LEFT -> LEFTpressed = true;
             case RIGHT -> RIGHTpressed = true;
             case SPACE -> SPACEpressed = true;
+            case DOWN -> DOWNpressed = true;
+            case A -> Apressed = true;
             default -> {
             }
         }
@@ -146,15 +153,14 @@ public class Controller implements gameListener {
     private void setReleasedKey(KeyEvent event) {
         switch (event.getCode()) {
             case UP -> UPpressed = false;
-            case W -> UPpressed = false;
             case LEFT -> LEFTpressed = false;
-            case A -> LEFTpressed = false;
             case RIGHT -> RIGHTpressed = false;
-            case D -> RIGHTpressed = false;
+            case DOWN -> DOWNpressed = false;
             case SPACE -> {
                 SPACEpressed = false;
                 SPACEreleased = true;
             }
+            case A -> Apressed = false;
             default -> {
             }
         }
@@ -162,7 +168,7 @@ public class Controller implements gameListener {
 
     public void shipAction(long now,Ship ship){
         if (UPpressed)
-            ship.acc();
+            ship.setHyperspaced(false);ship.acc();
         if (LEFTpressed)
             ship.turnLeft();
         if (RIGHTpressed)
@@ -175,58 +181,107 @@ public class Controller implements gameListener {
             gamePane.getChildren().add(bullet.getCharacter());
             lastUpdate = now;
             SPACEreleased = false;
-
+        }
+        if (Apressed){
+            timeline.stop();
+            do {
+                collision=false;
+                ship.Hyperspace();
+                for (Character enemy : enemies) {
+                    if (enemy.collide(ship)) {
+                        collision=true;
+                        break;
+                    }
+                }
+                for (Bullets bullet : bullets1) {
+                    if (ship.collide(bullet)) {
+                        collision=true;
+                        break;
+                    }
+                }
+            } while(collision);
+            addInvincibility(5,ship);
+        }
     }
+
+    private void updateCharacters() {
+        if (!ship.isHyperspaced()) {
+            ship.move();
+        }
+
+        enemies.forEach(Character::move);
+
+        bullets.forEach(bullet -> {
+            bullet.move();
+        });
+
+        bullets1.forEach(bullet1 -> {
+            bullet1.move();
+        });
     }
-
-
-
-//    private void handlePlayerInput(long now, Ship ship) {
-//        if (pressedKey.getOrDefault(KeyCode.A, false)) {
-//            pressedKey.remove(KeyCode.A);
-//            ship.Hyperspace();
-//        }
-//        if (pressedKey.getOrDefault(KeyCode.LEFT, false)) {
-//            ship.turnLeft();
-//        }
-//        if (pressedKey.getOrDefault(KeyCode.RIGHT, false)) {
-//            ship.turnRight();
-//        }
-//        if (pressedKey.getOrDefault(KeyCode.UP, false)) {
-//            ship.acc();
-//        }
-//        if (pressedKey.getOrDefault(KeyCode.SPACE, false) && (now - lastUpdate > 330_000_000)) {
-//            Bullets bullet = new Bullets((int) (ship.getCharacter().getTranslateX()), (int) (ship.getCharacter().getTranslateY()));
-//            bullet.getCharacter().setRotate(ship.getCharacter().getRotate());
-//            bullets.add(bullet);
-//            bullet.acc();
-//            gamePane.getChildren().add(bullet.getCharacter());
-//            lastUpdate = now;
-//        }
-//    }
 
     private void checkCollisions() {
+        checkShipCollisions();
+
+        bullets.forEach(bullet -> {
+            enemies.forEach(enemy -> {
+                if(enemy.collide(bullet)){
+                    if(enemy.getSize() == 1){incrementScore(10);}
+                    if(enemy.getSize() == 2 || enemy.getSize() == 3){
+                        double X = enemy.getCharacter().getTranslateX();
+                        double Y = enemy.getCharacter().getTranslateY();
+                        int Z = enemy.getSize();
+                        Downgrade((int)X+10,(int)Y+10,Z);
+                        Downgrade((int)X-10,(int)Y-10,Z);
+                    }
+                    if(enemy.getSize() == 4){
+                        incrementScore(100);
+                        bullets1.clear();
+                        bullets1.forEach(bullet1 -> {
+                            gamePane.getChildren().remove(bullet1.getCharacter());
+                        });
+                    }
+                    gamePane.getChildren().remove(enemy.getCharacter());
+                    enemies.remove(enemy);
+                    gamePane.getChildren().remove(bullet.getCharacter());
+                    bullets.remove(bullet);
+                }
+            });
+        });
+
+        bullets1.forEach(bullet ->{
+            if(ship.collide(bullet) && !ship.isInvincible()){
+                gameListener.gameOver();
+                gamePane.getChildren().remove(ship.getCharacter());
+                gamePane.getChildren().remove(bullet.getCharacter());
+                bullets.remove(bullet);
+                bullets1.forEach(bullet1 -> {
+                    gamePane.getChildren().remove(bullet1.getCharacter());
+                });
+
+            }
+        });
+    }
+    private void checkShipCollisions() {
         enemies.forEach(enemy -> {
             if (enemy.collide(ship)) {
-                gamePane.getChildren().remove(ship.getCharacter());
-                gameListener.gameOver();
+                if(lives > 0){
+                    ship = new Ship(Width / 2, Height / 2);
+                    gamePane.getChildren().add(ship.getCharacter());
+                    gameListener.livesLeftChanged(lives -= 1);
+                }
+                if(lives == 0){
+                    gameListener.gameOver();
+                    gamePane.getChildren().remove(ship.getCharacter());
+                }
             }
         });
     }
 
-    private void updateBullets(long now) {
-        bullets.forEach(Bullets::move);
-        bullets1.forEach(Bullets::move);
-    }
-
-    private void checkBulletEnemyCollisions() {
-        bullets.forEach(bullet -> {
-            enemies.forEach(enemy -> {
-                if (enemy.collide(bullet)) {
-                    handleEnemyHit(enemy, bullet);
-                }
-            });
-        });
+    public void Downgrade(int x,int y,int z){
+        Asteroids asteroid = new Asteroids(x,y,z-1);
+        enemies.add(asteroid);
+        gamePane.getChildren().add(asteroid.getCharacter());
     }
 
     private void updateLevels() {
@@ -235,7 +290,6 @@ public class Controller implements gameListener {
             if (currentLevelIndex >= levels.length) {
                 gamePane.getChildren().remove(ship.getCharacter());
                 gameListener.gameOver();
-                text.setText("You Win!");
                 return;
             }
 
@@ -257,89 +311,73 @@ public class Controller implements gameListener {
         }
     }
 
-    private void Downgrade(Polygon x, int y, int z) {
-        Character newEnemy1 = new Character(x, y, z - 1);
-        Character newEnemy2 = new Character(x, y, z - 1);
-
-        gamePane.getChildren().add(newEnemy1.getCharacter());
-        gamePane.getChildren().add(newEnemy2.getCharacter());
-
-        enemies.add(newEnemy1);
-        enemies.add(newEnemy2);
+    public static void addInvincibility(int seconds,Ship ship) {
+        ship.setInvincible(true);
+        Circle circle = new Circle(60);
+        timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(seconds), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                ship.setInvincible(false); // Set the ship as not invincible after the duration
+                timeline.stop();
+            }
+        }));
+        timeline.play();
     }
 
-    private void handleEnemyHit(Character enemy, Bullets bullet) {
-        if (enemy.getSize() == 1) {
-            points += 10;
-            text.setText("Points:" + points);
-        }
-        if (enemy.getSize() == 2 || enemy.getSize() == 3) {
-            double X = enemy.getCharacter().getTranslateX();
-            double Y = enemy.getCharacter().getTranslateY();
-            int Z = enemy.getSize();
-//            Downgrade(X + 10, Y + 10, Z);
-//            Downgrade(X - 10, Y - 10, Z);
-        }
-        if (enemy.getSize() == 4) {
-            points += 100;
-            text.setText("Points:" + points);
-            bullets1.clear();
-            bullets1.forEach(bullet1 -> {
-                gamePane.getChildren().remove(bullet1.getCharacter());
-            });
-        }
-        gamePane.getChildren().remove(enemy.getCharacter());
-
-    }
-
-
-    private Pane getMenuPane(String s) {
-        FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource(s));
-        fxmlLoader.setController(this.menuContr);
-
+    public Pane getMenuPane(String s) {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(s));
+        fxmlLoader.setController(menuContr);
         try {
-            return (Pane)fxmlLoader.load();
-        } catch (IOException var4) {
-            System.out.println(var4.toString());
+            return fxmlLoader.load();
+        } catch (IOException e) {
+            System.out.println(e.toString());
             return null;
         }
     }
 
     public void changeMenu(String s) {
         switch (s) {
-            case "newGame.fxml":
-                this.menuContainer.setCenter(this.newGamePane);
-                break;
-            case "gameOver.fxml":
-                this.menuContainer.setCenter(this.savePane);
-                break;
-            default:
-                this.menuContainer.setCenter((Node)null);
+            case "newGame.fxml" -> menuContainer.setCenter(newGamePane);
+            case "gameOver.fxml" -> menuContainer.setCenter(savePane);
+            default -> this.menuContainer.setCenter((Node) null);
         }
 
     }
 
-    public void livesLeftChanged(int livedLeft) {
+    @Override
+    public void livesLeftChanged(int liveLeft) {
+        livesLeft.setText(liveLeft + " lives left");
+    }
+    @Override
+    public void scoreChanged(int newScore) {
+        currentScore.setText("Score: " + newScore);
     }
 
-    public void scoreChanged(int newScore) {
+    private void incrementScore(int score) {
+        gameListener.scoreChanged(this.score += score);
     }
 
     public void addScore(String playerName) {
-        this.scoreBoard.addScore(playerName, this.points);
-        this.updateScoreBoard();
+        scoreBoard.addScore(playerName, this.score);
+        updateScoreBoard();
     }
-
+    @Override
     public void gameOver() {
         UPpressed = false;
         LEFTpressed = false;
         RIGHTpressed = false;
-        this.menuContr.gameOver(this.points, this.scoreBoard.getHighScore());
+
+        menuContr.gameOver(this.score, this.scoreBoard.getHighScore());
+
     }
 
 
-
     private void updateScoreBoard() {
+        scoreBoardList.setItems(scoreBoard.getScores().stream()
+                .limit(18)
+                .map(element -> scoreBoard.getScores().indexOf(element) + 1 + ". " + element.getKey() + ": "
+                        + element.getValue())
+                .collect(Collectors.toCollection(FXCollections::observableArrayList)));
     }
 
 

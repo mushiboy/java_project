@@ -7,8 +7,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<Pane fx:id="savePane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="274.0" prefWidth="418.0" style="-fx-background-color: black; -fx-border-color: white;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
+<Pane fx:id="savePane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="274.0" prefWidth="418.0" style="-fx-background-color: black; -fx-border-color: white;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" >
       <Text fx:id="largeScoreEnd" fill="WHITE" layoutY="73.0" stroke="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" textAlignment="CENTER" wrappingWidth="417.0">
          <font>
             <Font size="35.0" />
@@ -20,7 +19,6 @@
          </font>
       </Text>
       <Pane layoutX="57.0" layoutY="124.0" prefHeight="121.0" prefWidth="304.0">
-         <children>
             <Text fx:id="saveInfoText" fill="WHITE" layoutX="22.0" layoutY="14.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Enter playername to save score" textAlignment="CENTER" wrappingWidth="410.0" x="-82.0" y="5.0">
                <font>
                   <Font size="15.0" />
@@ -39,7 +37,7 @@
                   <Font size="18.0" />
                </font>
             </Button>
-            <TextField fx:id="playerName" focusTraversable="false" layoutX="29.0" layoutY="32.0" prefHeight="30.0" prefWidth="246.0" promptText="name" style="-fx-font-size: 18;">
+            <TextField fx:id="playerName" focusTraversable="false" layoutX="29.0" layoutY="32.0" onKeyTyped="#playerNameInputChanged" prefHeight="30.0" prefWidth="246.0" promptText="name" style="-fx-font-size: 18;">
                <font>
                   <Font size="18.0" />
                </font>
@@ -47,7 +45,5 @@
                   <Cursor fx:constant="TEXT" />
                </cursor>
             </TextField>
-         </children>
       </Pane>
-   </children>
 </Pane>

@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -11,6 +12,8 @@ import javafx.scene.text.Text;
 public class menuController {
     private gameListener gameListener;
     Controller controller;
+    @FXML
+    private BorderPane menuContainer;
     @FXML
     private Button newGameButton;
     @FXML
@@ -30,75 +33,76 @@ public class menuController {
     @FXML
     private Pane savePane;
 
-    public menuController() {
-    }
 
     public void init(Controller controller) {
         this.controller = controller;
-        this.initKeyHandles();
+        newGamePane = controller.getMenuPane("newGame.fxml");
+        initKeyHandles();
     }
 
     private void initKeyHandles() {
-        this.newGameButton.setOnAction((event) -> {
-            this.startGame();
+        newGameButton.setOnAction((event) -> {
+            startGame();
         });
-        this.saveButton.setOnAction((event) -> {
-            this.handleSave();
+        saveButton.setOnAction((event) -> {
+            handleSave();
         });
-        this.dontSaveButton.setOnAction((event) -> {
-            this.handleDontSave();
+        dontSaveButton.setOnAction((event) -> {
+            handleDontSave();
         });
     }
 
     @FXML
     private void startGame() {
-        this.controller.changeMenu(" ");
-        this.newGameButton.setDefaultButton(true);
-        this.controller.startGame();
+        controller.changeMenu(" ");
+        newGameButton.setDefaultButton(true);
+        controller.startGame();
     }
 
     @FXML
     private void handleSave() {
-        this.controller.addScore(this.playerName.getText().trim());
-        this.handleDontSave();
+        controller.addScore(this.playerName.getText().trim());
+        handleDontSave();
     }
 
     @FXML
     private void handleDontSave() {
-        this.controller.changeMenu("newGame.fxml");
-        this.newGameButton.setDefaultButton(true);
+        savePane.setVisible(false);
+        newGamePane.setVisible(true);
+        newGameButton.setDefaultButton(true);
+
     }
 
     @FXML
     private void playerNameInputChanged() {
         int textInputLength = this.playerName.getText().trim().length();
         if (textInputLength == 0) {
-            this.saveInfoText.setText("Enter playername to save score");
-            this.saveInfoText.setFill(Color.WHITE);
-            this.saveButton.setDisable(true);
+            saveInfoText.setText("Enter playername to save score");
+            saveInfoText.setFill(Color.WHITE);
+            saveButton.setDisable(true);
         } else if (textInputLength > 14) {
-            this.saveInfoText.setText("Name cannot exceed 14 characters");
-            this.saveInfoText.setFill(Color.RED);
-            this.saveButton.setDisable(true);
+            saveInfoText.setText("Name cannot exceed 14 characters");
+            saveInfoText.setFill(Color.RED);
+            saveButton.setDisable(true);
         } else if (!Pattern.matches("^[a-zA-Z0-9]*$", this.playerName.getText().trim())) {
-            this.saveInfoText.setText("Playername cannot include special characters");
-            this.saveInfoText.setFill(Color.RED);
-            this.saveButton.setDisable(true);
+            saveInfoText.setText("Playername cannot include special characters");
+            saveInfoText.setFill(Color.RED);
+            saveButton.setDisable(true);
         } else {
-            this.saveInfoText.setText("Enter playername to save score");
-            this.saveInfoText.setFill(Color.WHITE);
-            this.saveButton.setDisable(false);
+            saveInfoText.setText("Enter playername to save score");
+            saveInfoText.setFill(Color.WHITE);
+            saveButton.setDisable(false);
         }
 
     }
 
     public void gameOver(int score, int highscore) {
-        this.controller.changeMenu("gameOver.fxml");
-        this.newGameButton.setDefaultButton(false);
-        this.playerName.requestFocus();
-        this.saveButton.setDefaultButton(true);
-        this.dontSaveButton.setCancelButton(true);
-        this.largeScoreEnd.setText(score > highscore ? "New Highscore!" : "Game over!");
-        this.smallScoreEnd.setText("Score: " + score);
+        controller.changeMenu("gameOver.fxml");
+        newGameButton.setDefaultButton(false);
+        playerName.requestFocus();
+        saveButton.setDefaultButton(true);
+        dontSaveButton.setCancelButton(true);
+        largeScoreEnd.setText(score > highscore ? "New Highscore!" : "Game over!");
+        smallScoreEnd.setText("Score: " + score);
     }
 }

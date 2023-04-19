@@ -1,9 +1,9 @@
 package com.example.game233;
 
 public interface gameListener {
-    void livesLeftChanged(int var1);
+    void livesLeftChanged(int liveLeft);
 
     void gameOver();
 
-    void scoreChanged(int var1);
+    void scoreChanged(int newScore);
 }
