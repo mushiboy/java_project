@@ -23,8 +23,6 @@ public class MyGame extends Application {
     List<Bullet> bullets = new ArrayList<>();
     List<Bullet> alien_bullets = new ArrayList<>();
     List<Character> enemies = new ArrayList<>();
-
-    List<Bullet> alienBulletsToRemove = new ArrayList<>();
     List<Asteroid> asteroidsToDowngrade = new ArrayList<>();
 
     static Pane pane = new Pane();
