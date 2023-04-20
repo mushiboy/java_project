@@ -21,7 +21,7 @@ public class MyGame extends Application {
     public int points = 0;
 
     List<Bullet> bullets = new ArrayList<>();
-    List<Bullet> bullets1 = new ArrayList<>();
+    List<Bullet> alien_bullets = new ArrayList<>();
     List<Character> enemies = new ArrayList<>();
 
     static Pane pane = new Pane();
@@ -66,7 +66,7 @@ public class MyGame extends Application {
         new AnimationTimer(){
             private long lastUpdate = 0;
             private long lastbullets = 0;
-            private int currentLevelIndex = 0;
+            private int currentLevel = 0;
 
             public void handle(long now){
                 if(pressedKey.getOrDefault(KeyCode.A,false)){
@@ -83,7 +83,7 @@ public class MyGame extends Application {
                                 break;
                             }
                         }
-                        for (Bullet bullet : bullets1) {
+                        for (Bullet bullet : alien_bullets) {
                             if (ship.collide(bullet)) {
                                 collision=true;
                                 break;
@@ -109,13 +109,13 @@ public class MyGame extends Application {
 
                 enemies.forEach(enemy -> {
                     if(enemy.getSize() == 4) {
-                        while(now - lastbullets > 440_000_000) {
+                        while(now - lastbullets > 1000000000) {
                             Bullet bullet1 = new Bullet((int)(enemy.getCharacter().getTranslateX()), (int)(enemy.getCharacter().getTranslateY()));
                             var diff_y = ship.getCharacter().getTranslateX() - enemy.getCharacter().getTranslateX();
                             var diff_x = ship.getCharacter().getTranslateY() - enemy.getCharacter().getTranslateY();
                             var angle = Math.toDegrees(Math.atan2(diff_x, diff_y));
                             bullet1.getCharacter().setRotate(angle);
-                            bullets1.add(bullet1);
+                            alien_bullets.add(bullet1);
                             bullet1.acc();
                             pane.getChildren().add(bullet1.getCharacter());
                             lastbullets = now;
@@ -143,16 +143,16 @@ public class MyGame extends Application {
                     bullet.move();
                 });
                 
-                bullets1.forEach(bullet1 -> {
+                alien_bullets.forEach(bullet1 -> {
                     bullet1.move();
                 });
 
-                bullets1.forEach(bullet ->{
+                alien_bullets.forEach(bullet ->{
                     if(ship.collide(bullet) && !ship.isInvincible()){
                         pane.getChildren().remove(ship.getCharacter());
                         pane.getChildren().remove(bullet.getCharacter());
                         bullets.remove(bullet);
-                        bullets1.forEach(bullet1 -> {
+                        alien_bullets.forEach(bullet1 -> {
                             pane.getChildren().remove(bullet1.getCharacter());
                         });
                         text.setText("Game Over:"+points);
@@ -173,10 +173,10 @@ public class MyGame extends Application {
                             if(enemy.getSize() == 4){
                                 points += 100;
                                 text.setText("Points:"+points);
-                                bullets1.forEach(bullet1 -> {
+                                alien_bullets.forEach(bullet1 -> {
                                     pane.getChildren().remove(bullet1.getCharacter());
                                 });
-                                bullets1.clear();
+                                alien_bullets.clear();
                             }
                             pane.getChildren().remove(bullet.getCharacter());
                             bullets.remove(bullet);
@@ -187,8 +187,8 @@ public class MyGame extends Application {
                 });
 
                 if (enemies.isEmpty()) {
-                    currentLevelIndex++;
-                    if (currentLevelIndex >= levels.length) {
+                    currentLevel++;
+                    if (currentLevel >= levels.length) {
                         // game over
                         pane.getChildren().remove(ship.getCharacter());
                         stage.setScene(endgame);
@@ -200,13 +200,13 @@ public class MyGame extends Application {
                     });
                     bullets.clear();
                     
-                    bullets1.forEach(bullet -> {
+                    alien_bullets.forEach(bullet -> {
                         pane.getChildren().remove(bullet.getCharacter());
                     });
-                    bullets1.clear();
+                    alien_bullets.clear();
 
                     enemies.clear();
-                    enemies = levels[currentLevelIndex].getEnemyList();
+                    enemies = levels[currentLevel].getEnemyList();
                     enemies.forEach(enemy -> {
                         pane.getChildren().add(enemy.getCharacter());
                     });
