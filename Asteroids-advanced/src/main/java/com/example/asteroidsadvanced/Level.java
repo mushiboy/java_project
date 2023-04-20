@@ -19,8 +19,8 @@ public class Level {
     public static Level[] createLevels() {
         Level[] levels = new Level[14];
     
-        levels[0] = new Level(1, 1, 1, 1, 0);
-        levels[1] = new Level(2, 0, 0, 0, 1);
+        levels[0] = new Level(1, 2, 0, 0, 0);
+        levels[1] = new Level(2, 4, 0, 0, 0);
         levels[2] = new Level(3, 2, 1, 0, 0);
         levels[3] = new Level(4, 0, 2, 0, 0);
         levels[4] = new Level(5, 2, 3, 0, 0);
