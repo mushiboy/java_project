@@ -24,6 +24,7 @@ public class MyGame extends Application {
     List<Bullet> alien_bullets = new ArrayList<>();
     List<Character> enemies = new ArrayList<>();
     List<Asteroid> asteroidsToDowngrade = new ArrayList<>();
+    private long alienSpawnTime;
 
     static Pane pane = new Pane();
     Pane end_pane = new Pane();
@@ -109,9 +110,9 @@ public class MyGame extends Application {
                 }
 
                 enemies.forEach(enemy -> {
-                    if(enemy.getSize() == 4) {
-                        while(now - lastbullets > 1000000000) {
-                            Bullet bullet1 = new Bullet((int)(enemy.getCharacter().getTranslateX()), (int)(enemy.getCharacter().getTranslateY()));
+                    if (now - alienSpawnTime > 5_000_000_000L && enemy.getSize() == 4) {
+                        while (now - lastbullets > 1_000_000_000) {
+                            Bullet bullet1 = new Bullet((int) (enemy.getCharacter().getTranslateX()), (int) (enemy.getCharacter().getTranslateY()));
                             var diff_y = ship.getCharacter().getTranslateX() - enemy.getCharacter().getTranslateX();
                             var diff_x = ship.getCharacter().getTranslateY() - enemy.getCharacter().getTranslateY();
                             var angle = Math.toDegrees(Math.atan2(diff_x, diff_y));
@@ -123,7 +124,7 @@ public class MyGame extends Application {
                         }
                     }
                 });
-
+                
                 if (!ship.isHyperspaced()) {
                     ship.move();
                 }
@@ -220,6 +221,8 @@ public class MyGame extends Application {
                     enemies.forEach(enemy -> {
                         pane.getChildren().add(enemy.getCharacter());
                     });
+
+                    alienSpawnTime = System.nanoTime();
                 };
             };
         }.start();
