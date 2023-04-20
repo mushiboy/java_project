@@ -24,6 +24,9 @@ public class MyGame extends Application {
     List<Bullet> alien_bullets = new ArrayList<>();
     List<Character> enemies = new ArrayList<>();
 
+    List<Bullet> alienBulletsToRemove = new ArrayList<>();
+    List<Asteroid> asteroidsToDowngrade = new ArrayList<>();
+
     static Pane pane = new Pane();
     Pane end_pane = new Pane();
     double Rotation = 0;
@@ -147,28 +150,32 @@ public class MyGame extends Application {
                     bullet1.move();
                 });
 
-                alien_bullets.forEach(bullet ->{
-                    if(ship.collide(bullet) && !ship.isInvincible()){
+                Iterator<Bullet> alienBulletIterator = alien_bullets.iterator();
+                while (alienBulletIterator.hasNext()) {
+                    Bullet bullet = alienBulletIterator.next();
+                    if (ship.collide(bullet) && !ship.isInvincible()) {
                         pane.getChildren().remove(ship.getCharacter());
                         pane.getChildren().remove(bullet.getCharacter());
-                        bullets.remove(bullet);
-                        alien_bullets.forEach(bullet1 -> {
-                            pane.getChildren().remove(bullet1.getCharacter());
-                        });
-                        text.setText("Game Over:"+points);
+                        alienBulletIterator.remove();
+                        text.setText("Game Over:" + points);
                     }
-                });
+                }
 
-                bullets.forEach(bullet -> {
-                    enemies.forEach(enemy -> {
-                        if(enemy.collide(bullet)){
+                Iterator<Bullet> bulletIterator = bullets.iterator();
+
+                while (bulletIterator.hasNext()) {
+                    Bullet bullet = bulletIterator.next();
+                    Iterator<Character> enemyIterator = enemies.iterator();
+                    while (enemyIterator.hasNext()) {
+                        Character enemy = enemyIterator.next();
+                        if (enemy.collide(bullet)) {
                             if(enemy.getSize() == 1){points += 10;text.setText("Points:"+points);}
                             if(enemy.getSize() == 2 || enemy.getSize() == 3){
                                 double X = enemy.getCharacter().getTranslateX();
                                 double Y = enemy.getCharacter().getTranslateY();
                                 int Z = enemy.getSize();
-                                Downgrade((int)X+10,(int)Y+10,Z);
-                                Downgrade((int)X-10,(int)Y-10,Z);
+                                asteroidsToDowngrade.add(new Asteroid((int)X+10, (int)Y+10, Z - 1));
+                                asteroidsToDowngrade.add(new Asteroid((int)X-10, (int)Y-10, Z - 1));
                             }
                             if(enemy.getSize() == 4){
                                 points += 100;
@@ -177,14 +184,19 @@ public class MyGame extends Application {
                                     pane.getChildren().remove(bullet1.getCharacter());
                                 });
                                 alien_bullets.clear();
-                            }
+                                }
                             pane.getChildren().remove(bullet.getCharacter());
-                            bullets.remove(bullet);
+                            bulletIterator.remove(); // Remove bullet using iterator
                             pane.getChildren().remove(enemy.getCharacter());
-                            enemies.remove(enemy);
+                            enemyIterator.remove(); // Remove enemy using iterator
                         }
-                    });
-                });
+                    };
+                };
+
+                for (Asteroid asteroid : asteroidsToDowngrade) {
+                    Downgrade((int) asteroid.getCharacter().getTranslateX(), (int) asteroid.getCharacter().getTranslateY(), asteroid.getSize());
+                }
+                asteroidsToDowngrade.clear();
 
                 if (enemies.isEmpty()) {
                     currentLevel++;
@@ -216,7 +228,7 @@ public class MyGame extends Application {
     }
 
     public void Downgrade(int x,int y,int z){
-        Asteroid asteroid = new Asteroid(x,y,z-1);
+        Asteroid asteroid = new Asteroid(x,y,z);
         enemies.add(asteroid);
         pane.getChildren().add(asteroid.getCharacter());
     }
