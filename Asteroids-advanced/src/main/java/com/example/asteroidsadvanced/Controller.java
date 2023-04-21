@@ -300,7 +300,7 @@ public class Controller {
             String playerName = name.getText();
             try {
                 try {
-                    BufferedWriter writer = new BufferedWriter(new FileWriter("src/main/resources/highScores.txt", true));
+                    BufferedWriter writer = new BufferedWriter(new FileWriter("/Asteroids-advanced/src/main/resources/highScores.txt", true));
                     writer.write(playerName+": "+points+"\n");
                     writer.close();
                 } catch (IOException e) {
@@ -312,7 +312,7 @@ public class Controller {
             }
         });
 
-        root.getChildren().addAll(promptLabel, name,saveButton);
+        root.getChildren().addAll(promptLabel, name, saveButton);
 
         Scene scene = new Scene(root, 300, 200);
 
@@ -329,7 +329,7 @@ public class Controller {
 
         StringBuilder content = new StringBuilder();
         try{
-            BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/highScores.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("./Asteroids-advanced/src/main/resources/highScores.txt"));
             String line;
 
             while((line = reader.readLine()) != null){
@@ -358,7 +358,7 @@ public class Controller {
         Pane pane = new Pane();
         StringBuilder content = new StringBuilder();
         try{
-            BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/introduction.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("./Asteroids-advanced/src/main/resources/introduction.txt"));
             String line;
 
             while((line = reader.readLine()) != null){
