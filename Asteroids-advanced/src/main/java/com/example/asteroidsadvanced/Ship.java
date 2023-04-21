@@ -25,21 +25,12 @@ public class Ship extends Character{
 
 
     public void Hyperspace(){
-
-//        double angle = Math.toRadians(super.getCharacter().getRotate());
-//        double X = Math.cos(angle)*15;
-//        double Y = Math.sin(angle)*15;
-//
-//        super.getCharacter().setTranslateX(super.getCharacter().getTranslateX()+X);
-//        super.getCharacter().setTranslateY(super.getCharacter().getTranslateY()+Y);
-        boolean collision;
         Random rnd = new Random();
         this.setHyperspaced(true);
         super.getCharacter().setTranslateX(Math.random() * (1920 - 100  - this.getCharacter().getBoundsInParent().getWidth()));
         super.getCharacter().setTranslateY(Math.random() * (1080 - 200 -this.getCharacter().getBoundsInParent().getHeight()));
         super.setMovement(-super.getMovement().getX(), -super.getMovement().getY());
     }
-
 
     public boolean collide(Character other){
         Shape collisionArea = Shape.intersect(super.getCharacter(), other.getCharacter());
