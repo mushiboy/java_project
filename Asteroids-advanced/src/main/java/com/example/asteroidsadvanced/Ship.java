@@ -23,10 +23,19 @@ public class Ship extends Character{
     }
 
 
-    public void Hyperspace(){
+    public void Hyperspace() {
         this.setHyperspaced(true);
-        super.getCharacter().setTranslateX(Math.random() * (1920 - 100  - this.getCharacter().getBoundsInParent().getWidth()));
-        super.getCharacter().setTranslateY(Math.random() * (1080 - 200 -this.getCharacter().getBoundsInParent().getHeight()));
+    
+        double newX;
+        double newY;
+    
+        do {
+            newX = Math.random() * (Controller.Width - 100 - this.getCharacter().getBoundsInParent().getWidth()) + 50;
+            newY = Math.random() * (Controller.Height - 100 - this.getCharacter().getBoundsInParent().getHeight()) + 50;
+        } while (Math.abs(newX - getCharacter().getTranslateX()) < 100 && Math.abs(newY - getCharacter().getTranslateY()) < 100);
+    
+        super.getCharacter().setTranslateX(newX);
+        super.getCharacter().setTranslateY(newY);
         super.setMovement(-super.getMovement().getX(), -super.getMovement().getY());
     }
 

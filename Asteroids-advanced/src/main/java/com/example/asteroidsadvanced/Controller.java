@@ -213,6 +213,8 @@ public class Controller {
                         if (enemy.collide(bullet)) {
                             if(enemy.getSize() == 1){points += 10;text.setText("Points:"+points);}
                             if(enemy.getSize() == 2 || enemy.getSize() == 3){
+                                points += 30;
+                                text.setText("Points:" + points);
                                 double X = enemy.getCharacter().getTranslateX();
                                 double Y = enemy.getCharacter().getTranslateY();
                                 int Z = enemy.getSize();
@@ -221,7 +223,7 @@ public class Controller {
                             }
                             if(enemy.getSize() == 4){
                                 points += 100;
-                                text.setText("Points:"+points);
+                                text.setText("Points:" + points);
                                 alien_bullets.forEach(bullet1 -> {
                                     pane.getChildren().remove(bullet1.getCharacter());
                                 });
