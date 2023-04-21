@@ -1,0 +1,5 @@
+Operation Introduction:
+
+Use the arrow keys to control the movement of the game character, use the space bar to fire
+
+The game ends when the ship collides with a meteorite, an alien ship and a bullet from an alien ship.

@@ -1,0 +1,9 @@
+APP: 250
+Test: 50
+another test: 250
+: 0
+: 0
+: 0
+1231231223: 0
+test: 0
+Second test: 0
