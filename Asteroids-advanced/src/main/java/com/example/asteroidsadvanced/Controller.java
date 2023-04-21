@@ -27,6 +27,7 @@ public class Controller {
     public static int Width = 800;
     public static int Height = 600;
     public int points = 0;
+    public int lives = 3;
 
     List<Bullet> bullets = new ArrayList<>();
     List<Bullet> alien_bullets = new ArrayList<>();
@@ -46,12 +47,15 @@ public class Controller {
         Stage begin = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         begin.close();
 
-        Random rnd = new Random();
         pane.setPrefSize(Width, Height);
 
         pane.getChildren().add(ship.getCharacter());
         Text text = new Text(10,20,"Points:"+points);
         pane.getChildren().add(text);
+
+        // Display the lives count on the screen
+        Text livesText = new Text(10, 40, "Lives: " + lives);
+        pane.getChildren().add(livesText);
 
         // create levels array
         Level[] levels = Level.createLevels();
@@ -146,15 +150,23 @@ public class Controller {
                 });
 
                 enemies.forEach(enemy -> {
-                    if(enemy.collide(ship)  && !ship.isInvincible()){
-                        pane.getChildren().remove(ship.getCharacter());
-                        stage.setScene(endgame);
-                        // End Game
-                        saveScore();
-                        stop();
-                        stage.close();
-                        // End Game
-                        text.setText("Game Over");
+                    if (enemy.collide(ship) && !ship.isInvincible()) {
+                        lives--;
+                        livesText.setText("Lives: " + lives);
+                        if (lives > 0) {
+                            // Reset the ship position and make it invincible for a short time
+                            ship.getCharacter().setTranslateX(Width / 3);
+                            ship.getCharacter().setTranslateY(Height / 3);
+                            addInvincibility(5);
+                        } else {
+                            // End the game when the lives count reaches 0
+                            pane.getChildren().remove(ship.getCharacter());
+                            stage.setScene(endgame);
+                            saveScore();
+                            stop();
+                            stage.close();
+                            livesText.setText("Game Over");
+                        }
                     }
                 });
 
@@ -170,10 +182,24 @@ public class Controller {
                 while (alienBulletIterator.hasNext()) {
                     Bullet bullet = alienBulletIterator.next();
                     if (ship.collide(bullet) && !ship.isInvincible()) {
-                        pane.getChildren().remove(ship.getCharacter());
+                        lives--;
+                        livesText.setText("Lives: " + lives);
                         pane.getChildren().remove(bullet.getCharacter());
                         alienBulletIterator.remove();
-                        text.setText("Game Over:" + points);
+                        if (lives > 0) {
+                            // Reset the ship position and make it invincible for a short time
+                            ship.getCharacter().setTranslateX(Width / 3);
+                            ship.getCharacter().setTranslateY(Height / 3);
+                            addInvincibility(5);
+                        } else {
+                            // End the game when the lives count reaches 0
+                            pane.getChildren().remove(ship.getCharacter());
+                            stage.setScene(endgame);
+                            saveScore();
+                            stop();
+                            stage.close();
+                            livesText.setText("Game Over: " + points);
+                        }
                     }
                 }
 
@@ -265,7 +291,6 @@ public class Controller {
     public void saveScore(){
         VBox root = new VBox();
         root.setStyle("-fx-background-color: black;");
-        Pane pane = new Pane();
         Stage stage = new Stage();
         Label promptLabel = new Label("Please enter your name: ");
         promptLabel.setStyle("-fx-font-size: 20pt; -fx-text-fill: white;");
@@ -302,7 +327,6 @@ public class Controller {
         VBox root = new VBox();
         root.setStyle("-fx-background-color: black;");
 
-        Pane pane = new Pane();
         StringBuilder content = new StringBuilder();
         try{
             BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/highScores.txt"));
@@ -325,6 +349,7 @@ public class Controller {
         stage.show();
 
     }
+
     @FXML
     public void Introduction() {
 
@@ -361,6 +386,5 @@ public class Controller {
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.show();
-
     }
 }

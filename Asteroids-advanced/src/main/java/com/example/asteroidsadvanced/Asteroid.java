@@ -9,7 +9,6 @@ public class Asteroid extends Character{
     private double rotationalMovement;
     private int size;
     int accelerationAmount;
-    private Random rnd = new Random();
     public Asteroid(int x, int y, int z) {
         super(new Polygon(25.0*z, 0.0, 50.0*z, 15.0*z, 40.0*z, 40.0*z, 10.0*z, 40.0*z, 0.0, 15.0*z), x, y);
         this.size = z;

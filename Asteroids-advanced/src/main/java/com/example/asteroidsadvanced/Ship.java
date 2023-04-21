@@ -3,7 +3,6 @@ package com.example.asteroidsadvanced;
 import javafx.animation.Timeline;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
-import java.util.Random;
 
 public class Ship extends Character{
     private boolean isInvincible = false;
@@ -25,7 +24,6 @@ public class Ship extends Character{
 
 
     public void Hyperspace(){
-        Random rnd = new Random();
         this.setHyperspaced(true);
         super.getCharacter().setTranslateX(Math.random() * (1920 - 100  - this.getCharacter().getBoundsInParent().getWidth()));
         super.getCharacter().setTranslateY(Math.random() * (1080 - 200 -this.getCharacter().getBoundsInParent().getHeight()));
