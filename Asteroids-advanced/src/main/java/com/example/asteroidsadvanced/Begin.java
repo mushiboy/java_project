@@ -29,7 +29,7 @@ public class Begin {
 
         StringBuilder content = new StringBuilder();
         try{
-            BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/highScores.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("./Asteroids-advanced/src/main/resources/highScores.txt"));
             String line;
 
             while((line = reader.readLine()) != null){
@@ -41,7 +41,7 @@ public class Begin {
         }
         // Create the high scores label and set its font and color
         Label highScoresLabel = new Label(content.toString());
-        highScoresLabel.setFont(Font.font("Brush Script MT", 20));
+        highScoresLabel.setFont(Font.font("Arial", 25));
         highScoresLabel.setTextFill(Color.BLACK);
 
         // Wrap the high scores label in a scroll pane
@@ -71,7 +71,7 @@ public class Begin {
         Pane pane = new Pane();
         StringBuilder content = new StringBuilder();
         try{
-            BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/introduction.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("./Asteroids-advanced/src/main/resources/introduction.txt"));
             String line;
 
             while((line = reader.readLine()) != null){
@@ -87,7 +87,7 @@ public class Begin {
             e.printStackTrace();
         }
         Label label = new Label(content.toString());
-        label.setFont(Font.font("Brush Script MT", 20));
+        label.setFont(Font.font("Arial", 25));
         label.setTextFill(Color.WHITE);
         pane.getChildren().add(label);
         root.getChildren().add(pane);

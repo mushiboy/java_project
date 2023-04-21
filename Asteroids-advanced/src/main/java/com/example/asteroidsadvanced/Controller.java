@@ -54,13 +54,17 @@ public class Controller {
 
         pane.getChildren().add(ship.getCharacter());
         Text text = new Text(10,20,"Points:"+points);
-        text.setFont(Font.font("Brush Script MT", FontWeight.BOLD, 30));
+        text.setFont(Font.font("Arial", 25));
         pane.getChildren().add(text);
 
         // Display the lives count on the screen
         Text livesText = new Text(10, 40, "Lives: " + lives);
-        livesText.setFont(Font.font("Brush Script MT", FontWeight.BOLD, 30));
+        livesText.setFont(Font.font("Arial", 25));
         pane.getChildren().add(livesText);
+
+        Text levelText = new Text(10, 60, "Level: 1"); // Start with level 1
+        levelText.setFont(Font.font("Arial", 25));
+        pane.getChildren().add(levelText);
 
         // create levels array
         Level[] levels = Level.createLevels();
@@ -249,11 +253,16 @@ public class Controller {
 
                 if (enemies.isEmpty()) {
                     currentLevel++;
+                    levelText.setText("Level: " + (currentLevel + 1)); // +1 because the level is zero-indexed
+
                     if (currentLevel >= levels.length) {
                         // game over
+                        livesText.setText("You Win!");
                         pane.getChildren().remove(ship.getCharacter());
                         stage.setScene(endgame);
-                        text.setText("You Win!");
+                        saveScore();
+                        stop();
+                        stage.close();
                         return;
                     }
                     bullets.forEach(bullet -> {
@@ -267,6 +276,9 @@ public class Controller {
                     alien_bullets.clear();
 
                     enemies.clear();
+
+                    addInvincibility(5);
+
                     enemies = levels[currentLevel].getEnemyList();
                     enemies.forEach(enemy -> {
                         pane.getChildren().add(enemy.getCharacter());
@@ -300,16 +312,16 @@ public class Controller {
         root.setStyle("-fx-background-color: black;");
         Stage stage = new Stage();
         Label promptLabel = new Label("                 GAME OVER \n Please enter your name: ");
-        promptLabel.setFont(Font.font("Brush Script MT", 20));
+        promptLabel.setFont(Font.font("Arial", 25));
         promptLabel.setTextFill(Color.WHITE);
-        promptLabel.setFont(Font.font("Brush Script MT", 20));
+        promptLabel.setFont(Font.font("Arial", 25));
         TextField name = new TextField();
         Button saveButton = new Button("Save");
         saveButton.setOnAction(event ->{
             String playerName = name.getText();
             try {
                 try {
-                    BufferedWriter writer = new BufferedWriter(new FileWriter("src/main/resources/highScores.txt", true));
+                    BufferedWriter writer = new BufferedWriter(new FileWriter("./Asteroids-advanced/src/main/resources/highScores.txt", true));
                     writer.write(playerName+": "+points+"\n");
                     writer.close();
                 } catch (IOException e) {
