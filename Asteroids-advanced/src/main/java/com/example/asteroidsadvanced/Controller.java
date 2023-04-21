@@ -5,20 +5,17 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -27,8 +24,8 @@ import java.io.*;
 import java.util.*;
 
 public class Controller {
-    public static int Width = 800;
-    public static int Height = 600;
+    public static int width = 800;
+    public static int height = 600;
     public int points = 0;
     public int lives = 3;
 
@@ -42,7 +39,7 @@ public class Controller {
     Pane end_pane = new Pane();
     double Rotation = 0;
 
-    static Ship ship = new Ship(Width/3,Height/3);
+    static Ship ship = new Ship(width/3, height/3);
     static Timeline timeline = new Timeline();
 
     public void start(ActionEvent actionEvent) throws IOException {
@@ -50,7 +47,7 @@ public class Controller {
         Stage begin = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         begin.close();
 
-        pane.setPrefSize(Width, Height);
+        pane.setPrefSize(width, height);
 
         pane.getChildren().add(ship.getCharacter());
         Text text = new Text(10,20,"Points:"+points);
@@ -164,8 +161,8 @@ public class Controller {
                         livesText.setText("Lives: " + lives);
                         if (lives > 0) {
                             // Reset the ship position and make it invincible for a short time
-                            ship.getCharacter().setTranslateX(Width / 3);
-                            ship.getCharacter().setTranslateY(Height / 3);
+                            ship.getCharacter().setTranslateX(width / 3);
+                            ship.getCharacter().setTranslateY(height / 3);
                             addInvincibility(5);
                         } else {
                             // End the game when the lives count reaches 0
@@ -197,8 +194,8 @@ public class Controller {
                         alienBulletIterator.remove();
                         if (lives > 0) {
                             // Reset the ship position and make it invincible for a short time
-                            ship.getCharacter().setTranslateX(Width / 3);
-                            ship.getCharacter().setTranslateY(Height / 3);
+                            ship.getCharacter().setTranslateX(width / 3);
+                            ship.getCharacter().setTranslateY(height / 3);
                             addInvincibility(5);
                         } else {
                             // End the game when the lives count reaches 0
@@ -354,6 +351,6 @@ public class Controller {
 
     public void clean(){
         pane = new Pane();
-        ship = new Ship(Width/3,Height/3);
+        ship = new Ship(width/3, height/3);
     }
 }

@@ -30,8 +30,8 @@ public class Ship extends Character{
         double newY;
     
         do {
-            newX = Math.random() * (Controller.Width - 100 - this.getCharacter().getBoundsInParent().getWidth()) + 50;
-            newY = Math.random() * (Controller.Height - 100 - this.getCharacter().getBoundsInParent().getHeight()) + 50;
+            newX = Math.random() * (Controller.width - 100 - this.getCharacter().getBoundsInParent().getWidth()) + 50;
+            newY = Math.random() * (Controller.height - 100 - this.getCharacter().getBoundsInParent().getHeight()) + 50;
         } while (Math.abs(newX - getCharacter().getTranslateX()) < 100 && Math.abs(newY - getCharacter().getTranslateY()) < 100);
     
         super.getCharacter().setTranslateX(newX);

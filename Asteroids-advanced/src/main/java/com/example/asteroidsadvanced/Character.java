@@ -78,16 +78,16 @@ public class Character {
 
         // Wrap the character around the screen if it goes off the edge
         if (this.character.getTranslateX() < 0){
-            this.character.setTranslateX(this.character.getTranslateX() + Controller.Width);
+            this.character.setTranslateX(this.character.getTranslateX() + Controller.width);
         }
-        if (this.character.getTranslateX() > Controller.Width){
-            this.character.setTranslateX(this.character.getTranslateX() % Controller.Width);
+        if (this.character.getTranslateX() > Controller.width){
+            this.character.setTranslateX(this.character.getTranslateX() % Controller.width);
         }
         if (this.character.getTranslateY() < 0){
-            this.character.setTranslateY(this.character.getTranslateY() + Controller.Height);
+            this.character.setTranslateY(this.character.getTranslateY() + Controller.height);
         }
-        if (this.character.getTranslateY() > Controller.Height){
-            this.character.setTranslateY(this.character.getTranslateY() % Controller.Height);
+        if (this.character.getTranslateY() > Controller.height){
+            this.character.setTranslateY(this.character.getTranslateY() % Controller.height);
         }
 
     }

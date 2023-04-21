@@ -38,22 +38,22 @@ public class Level {
         this.enemyList = new ArrayList<>();
 
         for (int i = 0; i < numSize1Asteroids; i++) {
-            Asteroid asteroid = new Asteroid(rnd.nextInt(1000), rnd.nextInt(1000), 1);
+            Asteroid asteroid = new Asteroid(rnd.nextInt(Controller.width - 100), rnd.nextInt(Controller.height - 100), 1);
             this.enemyList.add(asteroid);
         }
-
+        
         for (int i = 0; i < numSize2Asteroids; i++) {
-            Asteroid asteroid = new Asteroid(rnd.nextInt(1000), rnd.nextInt(1000), 2);
+            Asteroid asteroid = new Asteroid(rnd.nextInt(Controller.width - 100), rnd.nextInt(Controller.height - 100), 2);
             this.enemyList.add(asteroid);
         }
-
+        
         for (int i = 0; i < numSize3Asteroids; i++) {
-            Asteroid asteroid = new Asteroid(rnd.nextInt(1000), rnd.nextInt(1000), 3);
+            Asteroid asteroid = new Asteroid(rnd.nextInt(Controller.width - 100), rnd.nextInt(Controller.height - 100), 3);
             this.enemyList.add(asteroid);
         }
-
+        
         for (int i = 0; i < numAliens; i++) {
-            Alien alien = new Alien(rnd.nextInt(1000), rnd.nextInt(1000));
+            Alien alien = new Alien(rnd.nextInt(Controller.width - 100), rnd.nextInt(Controller.height - 100));
             this.enemyList.add(alien);
         }
     }
