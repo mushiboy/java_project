@@ -6,16 +6,19 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -35,7 +38,7 @@ public class Controller {
     List<Asteroid> asteroidsToDowngrade = new ArrayList<>();
     private long alienSpawnTime;
 
-    static Pane pane = new Pane();
+    Pane pane = new Pane();
     Pane end_pane = new Pane();
     double Rotation = 0;
 
@@ -51,10 +54,12 @@ public class Controller {
 
         pane.getChildren().add(ship.getCharacter());
         Text text = new Text(10,20,"Points:"+points);
+        text.setFont(Font.font("Brush Script MT", FontWeight.BOLD, 30));
         pane.getChildren().add(text);
 
         // Display the lives count on the screen
         Text livesText = new Text(10, 40, "Lives: " + lives);
+        livesText.setFont(Font.font("Brush Script MT", FontWeight.BOLD, 30));
         pane.getChildren().add(livesText);
 
         // create levels array
@@ -294,15 +299,17 @@ public class Controller {
         VBox root = new VBox();
         root.setStyle("-fx-background-color: black;");
         Stage stage = new Stage();
-        Label promptLabel = new Label("Please enter your name: ");
-        promptLabel.setStyle("-fx-font-size: 20pt; -fx-text-fill: white;");
+        Label promptLabel = new Label("                 GAME OVER \n Please enter your name: ");
+        promptLabel.setFont(Font.font("Brush Script MT", 20));
+        promptLabel.setTextFill(Color.WHITE);
+        promptLabel.setFont(Font.font("Brush Script MT", 20));
         TextField name = new TextField();
         Button saveButton = new Button("Save");
         saveButton.setOnAction(event ->{
             String playerName = name.getText();
             try {
                 try {
-                    BufferedWriter writer = new BufferedWriter(new FileWriter("/Asteroids-advanced/src/main/resources/highScores.txt", true));
+                    BufferedWriter writer = new BufferedWriter(new FileWriter("src/main/resources/highScores.txt", true));
                     writer.write(playerName+": "+points+"\n");
                     writer.close();
                 } catch (IOException e) {
@@ -311,6 +318,17 @@ public class Controller {
 
             } finally {
                 stage.close();
+                Stage stage1 = new Stage();
+                FXMLLoader fxmlLoader = new FXMLLoader(MyGame.class.getResource("menu.fxml"));
+                Scene scene = null;
+                try {
+                    scene = new Scene(fxmlLoader.load(),320,440);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                stage1.setTitle("Asteroids");
+                stage1.setScene(scene);
+                stage1.show();
             }
         });
 
@@ -322,71 +340,8 @@ public class Controller {
         stage.show();
     }
 
-
-    @FXML
-    public void display() {
-
-        VBox root = new VBox();
-        root.setStyle("-fx-background-color: black;");
-
-        StringBuilder content = new StringBuilder();
-        try{
-            BufferedReader reader = new BufferedReader(new FileReader("./Asteroids-advanced/src/main/resources/highScores.txt"));
-            String line;
-
-            while((line = reader.readLine()) != null){
-                content.append(line).append("\n");
-            }
-            reader.close();
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-        Label highScoresLabel = new Label(content.toString());
-        highScoresLabel.setFont(Font.font("Brush Script MT", 15));
-        highScoresLabel.setTextFill(Color.WHITE);
-        root.getChildren().add(highScoresLabel);
-        Scene scene = new Scene(root, 300, 200);
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.show();
-
-    }
-
-    @FXML
-    public void Introduction() {
-
-        VBox root = new VBox();
-        root.setStyle("-fx-background-color: black;");
-        Pane pane = new Pane();
-        StringBuilder content = new StringBuilder();
-        try{
-            BufferedReader reader = new BufferedReader(new FileReader("./Asteroids-advanced/src/main/resources/introduction.txt"));
-            String line;
-
-            while((line = reader.readLine()) != null){
-                int i = 0;
-                while(i<line.length()){
-                    content.append(line.charAt(i));
-                    i++;
-                    if(i%50==0){
-                        content.append("\n");
-                    }
-
-                }
-                content.append("\n");
-            }
-            reader.close();
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-        Label label = new Label(content.toString());
-        label.setFont(Font.font("Brush Script MT", 20));
-        label.setTextFill(Color.WHITE);
-        pane.getChildren().add(label);
-        root.getChildren().add(pane);
-        Scene scene = new Scene(root, 300, 200);
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.show();
+    public void clean(){
+        pane = new Pane();
+        ship = new Ship(Width/3,Height/3);
     }
 }
