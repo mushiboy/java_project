@@ -6,6 +6,7 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -41,6 +42,10 @@ public class Controller {
     static Timeline timeline = new Timeline();
 
     public void start(ActionEvent actionEvent) throws IOException {
+        // Close menu
+        Stage begin = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        begin.close();
+
         Random rnd = new Random();
         pane.setPrefSize(Width, Height);
 
