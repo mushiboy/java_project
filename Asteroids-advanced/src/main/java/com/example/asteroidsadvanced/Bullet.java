@@ -9,7 +9,7 @@ public class Bullet extends Character {
     public Bullet(int x, int y) {
         // Create a new Polygon object with 4 points and pass it to the parent Character class constructor
         // along with the x and y arguments (offset by 50 and 30 respectively for proper positioning)
-        super(new Polygon(5, -5, 5, 5, -5, 5, -5, -5), x + 50, y + 30);
+        super(new Polygon(5, -5, 5, 5, -5, 5, -5, -5), x + 25, y + 10);
     }
 
     // Move method for the Bullet class that updates the Bullet object's position based on its current movement values

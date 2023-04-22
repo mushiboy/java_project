@@ -18,7 +18,7 @@ public class Ship extends Character {
     // Ship constructor with initial x and y position
     public Ship(int x, int y) {
         // Call the superclass constructor with the Polygon representing the ship's shape and its initial position
-        super(new Polygon(0, 0, 100, 25, 0, 50, 25, 25), x, y);
+        super(new Polygon(0, 0, 50, 12.5, 0, 25, 12.5, 12.5), x, y);
     }
 
     // Setter for the invincibility status
