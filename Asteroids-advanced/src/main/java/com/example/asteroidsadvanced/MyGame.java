@@ -30,8 +30,6 @@ public class MyGame extends Application {
 
     // The main method serves as the entry point for the application
     public static void main(String[] args) {
-        // Print the working directory to the console
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
 
         // Launch the JavaFX application
         launch(args);

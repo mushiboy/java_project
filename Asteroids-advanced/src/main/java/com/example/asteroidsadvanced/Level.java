@@ -47,25 +47,25 @@ public class Level {
 
         // Add size 1 asteroids
         for (int i = 0; i < numSize1Asteroids; i++) {
-            Asteroid asteroid = new Asteroid(rnd.nextInt(Controller.width - 100), rnd.nextInt(Controller.height - 100), 1);
+            Asteroid asteroid = new Asteroid(rnd.nextInt(Math.abs(Controller.width - 100)), rnd.nextInt(Math.abs(Controller.height - 100)), 1);
             this.enemyList.add(asteroid);
         }
 
         // Add size 2 asteroids
         for (int i = 0; i < numSize2Asteroids; i++) {
-            Asteroid asteroid = new Asteroid(rnd.nextInt(Controller.width - 100), rnd.nextInt(Controller.height - 100), 2);
+            Asteroid asteroid = new Asteroid(rnd.nextInt(Math.abs(Controller.width - 100)), rnd.nextInt(Math.abs(Controller.height - 100)), 2);
             this.enemyList.add(asteroid);
         }
 
         // Add size 3 asteroids
         for (int i = 0; i < numSize3Asteroids; i++) {
-            Asteroid asteroid = new Asteroid(rnd.nextInt(Controller.width - 100), rnd.nextInt(Controller.height - 100), 3);
+            Asteroid asteroid = new Asteroid(rnd.nextInt(Math.abs(Controller.width - 100)), rnd.nextInt(Math.abs(Controller.height - 100)), 3);
             this.enemyList.add(asteroid);
         }
 
         // Add aliens
         for (int i = 0; i < numAliens; i++) {
-            Alien alien = new Alien(0, rnd.nextInt(Controller.height - 100));
+            Alien alien = new Alien(0, rnd.nextInt(Math.abs(Controller.height - 100)));
             this.enemyList.add(alien);
         }
     }

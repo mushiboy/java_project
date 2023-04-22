@@ -26,7 +26,7 @@ import java.util.*;
 // Controller class is responsible for managing the game state, user input, and UI updates
 public class Controller {
     // Static variables to define the game window dimensions
-    public static int width = 100;
+    public static int width = 1000;
     public static int height = 700;
     // Instance variables for player points and lives
     public int points = 0;
