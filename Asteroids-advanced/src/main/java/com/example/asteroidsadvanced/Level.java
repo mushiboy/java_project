@@ -53,7 +53,7 @@ public class Level {
         }
         
         for (int i = 0; i < numAliens; i++) {
-            Alien alien = new Alien(rnd.nextInt(Controller.width - 100), rnd.nextInt(Controller.height - 100));
+            Alien alien = new Alien(0, rnd.nextInt(Controller.height - 100));
             this.enemyList.add(alien);
         }
     }
