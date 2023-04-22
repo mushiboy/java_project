@@ -23,34 +23,43 @@ import javafx.util.Duration;
 import java.io.*;
 import java.util.*;
 
+// Controller class is responsible for managing the game state, user input, and UI updates
 public class Controller {
+    // Static variables to define the game window dimensions
     public static int width = 800;
     public static int height = 600;
+    // Instance variables for player points and lives
     public int points = 0;
     public int lives = 3;
 
+    // Lists to store bullets and enemies
     List<Bullet> bullets = new ArrayList<>();
     List<Bullet> alien_bullets = new ArrayList<>();
     List<Character> enemies = new ArrayList<>();
     List<Asteroid> asteroidsToDowngrade = new ArrayList<>();
     private long alienSpawnTime;
 
+    // JavaFX panes to display game elements and the end game screen
     Pane pane = new Pane();
     Pane end_pane = new Pane();
     double Rotation = 0;
 
-    static Ship ship = new Ship(width/3, height/3);
+    // Create the player's ship and a Timeline for animations
+    static Ship ship = new Ship(width / 3, height / 3);
     static Timeline timeline = new Timeline();
 
+    // Method to handle the start button click in the menu
     public void start(ActionEvent actionEvent) throws IOException {
-        // Close menu
+        // Close the menu window
         Stage begin = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         begin.close();
 
+        // Set the pane size and add the player's ship to it
         pane.setPrefSize(width, height);
-
         pane.getChildren().add(ship.getCharacter());
-        Text text = new Text(10,20,"Points:"+points);
+
+        // Display the points count on the screen
+        Text text = new Text(10, 20, "Points:" + points);
         text.setFont(Font.font("Arial", 25));
         pane.getChildren().add(text);
 
@@ -59,26 +68,32 @@ public class Controller {
         livesText.setFont(Font.font("Arial", 25));
         pane.getChildren().add(livesText);
 
+        // Display the current level on the screen
         Text levelText = new Text(10, 60, "Level: 1"); // Start with level 1
         levelText.setFont(Font.font("Arial", 25));
         pane.getChildren().add(levelText);
 
-        // create levels array
+        // Create an array of level configurations
         Level[] levels = Level.createLevels();
+        // Set the initial list of enemies based on the first level
         enemies = levels[0].getEnemyList();
 
+        // Add enemies to the pane
         enemies.forEach(enemy -> {
             pane.getChildren().add(enemy.getCharacter());
         });
-        //Adding invincibility to ship
+
+        // Add invincibility effect to the ship for 5 seconds
         addInvincibility(5);
 
+        // Create and set the scene for the game
         Scene scene = new Scene(pane);
         Scene endgame = new Scene(end_pane);
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.show();
 
+        // Use a HashMap to track key presses and releases for user input
         Map<KeyCode, Boolean> pressedKey = new HashMap<>();
         scene.setOnKeyPressed(keyEvent -> {
             pressedKey.put(keyEvent.getCode(), Boolean.TRUE);
@@ -287,11 +302,14 @@ public class Controller {
         }.start();
     }
 
-    public void Downgrade(int x,int y,int z){
-        Asteroid asteroid = new Asteroid(x,y,z);
+    // Method to downgrade an asteroid and add it to the game
+    public void Downgrade(int x, int y, int z) {
+        Asteroid asteroid = new Asteroid(x, y, z);
         enemies.add(asteroid);
         pane.getChildren().add(asteroid.getCharacter());
     }
+
+    // Method to add invincibility to the ship for a given duration (in seconds)
     public static void addInvincibility(int seconds) {
         ship.setInvincible(true);
         timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(seconds), new EventHandler<ActionEvent>() {
@@ -304,34 +322,33 @@ public class Controller {
         timeline.play();
     }
 
-    public void saveScore(){
+    // Method to save the player's score and display the game over screen
+    public void saveScore() {
         VBox root = new VBox();
         root.setStyle("-fx-background-color: black;");
         Stage stage = new Stage();
         Label promptLabel = new Label("                 GAME OVER \n Please enter your name: ");
         promptLabel.setFont(Font.font("Arial", 25));
         promptLabel.setTextFill(Color.WHITE);
-        promptLabel.setFont(Font.font("Arial", 25));
         TextField name = new TextField();
         Button saveButton = new Button("Save");
-        saveButton.setOnAction(event ->{
+
+        // Save button action event handler
+        saveButton.setOnAction(event -> {
             String playerName = name.getText();
             try {
-                try {
-                    BufferedWriter writer = new BufferedWriter(new FileWriter("./Asteroids-advanced/src/main/resources/highScores.txt", true));
-                    writer.write(playerName+": "+points+"\n");
-                    writer.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+                BufferedWriter writer = new BufferedWriter(new FileWriter("./Asteroids-advanced/src/main/resources/highScores.txt", true));
+                writer.write(playerName + ": " + points + "\n");
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             } finally {
                 stage.close();
                 Stage stage1 = new Stage();
                 FXMLLoader fxmlLoader = new FXMLLoader(MyGame.class.getResource("menu.fxml"));
                 Scene scene = null;
                 try {
-                    scene = new Scene(fxmlLoader.load(),320,440);
+                    scene = new Scene(fxmlLoader.load(), 320, 440);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -341,16 +358,16 @@ public class Controller {
             }
         });
 
+        // Add UI elements to the VBox and create a scene
         root.getChildren().addAll(promptLabel, name, saveButton);
-
         Scene scene = new Scene(root, 300, 200);
-
         stage.setScene(scene);
         stage.show();
     }
 
-    public void clean(){
+    // Method to clean the game state and reset the ship
+    public void clean() {
         pane = new Pane();
-        ship = new Ship(width/3, height/3);
+        ship = new Ship(width / 3, height / 3);
     }
 }
