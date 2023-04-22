@@ -5,6 +5,8 @@ package com.example.asteroidsadvanced;
 import javafx.animation.Timeline;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
+import javafx.animation.KeyFrame;
+import javafx.util.Duration;
 
 // Ship class extends the Character class and represents the player's spaceship
 public class Ship extends Character {
@@ -24,11 +26,38 @@ public class Ship extends Character {
     // Setter for the invincibility status
     public void setInvincible(boolean invincible) {
         this.isInvincible = invincible;
+        if (invincible) {
+        blinkShip();
+        }
     }
 
     // Getter for the invincibility status
     public boolean isInvincible() {
         return isInvincible;
+    }
+
+    // Method to create a blinking effect for the ship
+    public void blinkShip() {
+        // Check if the ship is invincible
+        if (isInvincible()) {
+            // Create a Timeline animation with a duration of 100 milliseconds
+            Timeline blinkTimeline = new Timeline(new KeyFrame(Duration.millis(100), event -> {
+                // Toggle the visibility of the ship
+                super.getCharacter().setVisible(!super.getCharacter().isVisible());
+            }));
+
+            // Set the cycle count to the desired number of blinks (e.g., 20 blinks for 2 seconds of invincibility)
+            blinkTimeline.setCycleCount(20);
+
+            // Set an event handler to reset the visibility and invincibility status when the animation ends
+            blinkTimeline.setOnFinished(event -> {
+                super.getCharacter().setVisible(true);
+                setInvincible(false);
+            });
+
+            // Start the blink animation
+            blinkTimeline.play();
+        }
     }
 
     // Method for initiating hyperspace jump
